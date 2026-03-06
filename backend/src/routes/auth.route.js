@@ -27,3 +27,5 @@ authRouter.get('/get-me', authMiddleware, getMeController);
  @desc Logout a user
  */
 authRouter.post('/logout', authMiddleware, logoutUserController);
+
+export default authRouter;

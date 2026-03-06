@@ -65,9 +65,9 @@ export const registerUserController = async (req, res) => {
  */
 export const loginUserController = async (req, res) => {
     try {
-        const { username, email, password } = req.body;
+        const { identifier, password } = req.body;
 
-        if ((!username && !email) || !password) {
+        if (!identifier || !password) {
             return res.status(400).json({
                 success: false,
                 message: 'Username/Email and Password are required to login'
@@ -76,7 +76,7 @@ export const loginUserController = async (req, res) => {
 
         const user = await userModel.findOne({
             $or: [
-                { username }, { email }
+                { username: identifier }, { email: identifier }
             ]
         }).select('+password')
 

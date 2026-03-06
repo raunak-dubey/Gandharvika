@@ -1,0 +1,123 @@
+.auth-page {
+    @include center;
+
+    .auth-form-container {
+        height: 100vh;
+        width: 45%;
+        padding-block: $gap;
+        padding-inline: 8rem;
+        @include center;
+        flex-direction: column;
+
+        .heading {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: $gap;
+        }
+
+        .sub-para {
+            font-size: 1.08rem;
+            margin-bottom: 2rem;
+            color: $muted;
+        }
+
+        .field {
+            label {
+                font-size: 0.9rem;
+            }
+
+            input {
+                width: 100%;
+                background-color: transparent;
+                color: $text;
+                border: 2px solid $muted;
+                padding: 0.8rem;
+                margin: $gap-sm 0;
+                border-radius: $radius;
+                outline: none;
+            }
+
+            input:focus {
+                outline: none;
+                border: 2px solid $accent;
+            }
+        }
+
+        .forgetPass {
+            font-size: 0.9rem;
+            color: $muted;
+            text-align: right;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: $gap-sm;
+        }
+
+        .form-footer {
+            @include center;
+            gap: $gap;
+
+            p {
+                color: $muted;
+                font-size: 0.9rem;
+            }
+
+            a {
+                color: $text;
+                font-size: 0.9rem;
+                text-decoration: none;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+}
+
+// ? Utility classes
+.btn {
+    width: 100%;
+    background-color: $accent;
+    color: $text;
+    border: none;
+    padding: 0.75rem;
+    margin-block: $gap;
+    border-radius: $radius;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s ease;
+
+    &:hover:not(:disabled) {
+        opacity: 0.9;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    &.loading {
+        @include center;
+    }
+}
+
+.form-error {
+    background: rgba(255, 0, 0, 0.08);
+    color: #ff4d4f;
+    padding: 0.75rem;
+    border-radius: $radius;
+    margin-top: $gap-sm;
+    margin-bottom: $gap-sm;
+    font-size: 0.9rem;
+    border: 1px solid rgba(255, 77, 79, 0.3);
+}
+
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
