@@ -126,7 +126,7 @@ const Form = ({ mode }) => {
             onChange={handleChange}
           />
 
-          <h4 className="forgetPass">Forget Password?</h4>
+          {!isLogin && <h4 className="forgetPass">Forget Password?</h4>}
 
           {formError && <div className="form-error">{formError}</div>}
 

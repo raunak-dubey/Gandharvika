@@ -22,25 +22,33 @@
             color: $muted;
         }
 
-        .field {
-            label {
-                font-size: 0.9rem;
-            }
+        form {
+            @include center;
+            flex-direction: column;
+            width: 90%;
 
-            input {
+            .field {
                 width: 100%;
-                background-color: transparent;
-                color: $text;
-                border: 2px solid $muted;
-                padding: 0.8rem;
-                margin: $gap-sm 0;
-                border-radius: $radius;
-                outline: none;
-            }
 
-            input:focus {
-                outline: none;
-                border: 2px solid $accent;
+                label {
+                    font-size: 0.9rem;
+                }
+
+                input {
+                    width: 100%;
+                    background-color: transparent;
+                    color: $text;
+                    border: 2px solid $muted;
+                    padding: 0.8rem;
+                    margin: $gap-sm 0;
+                    border-radius: $radius;
+                    outline: none;
+                }
+
+                input:focus {
+                    outline: none;
+                    border: 2px solid $accent;
+                }
             }
         }
 
