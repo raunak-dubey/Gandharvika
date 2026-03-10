@@ -10,10 +10,6 @@ const handleError = (err, fallback) => {
         throw new Error(err.response.data.message);
     }
 
-    if (err.request) {
-        throw new Error("Network error. Check your connection.");
-    }
-
     throw new Error(fallback);
 };
 

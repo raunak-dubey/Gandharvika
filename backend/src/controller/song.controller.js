@@ -17,7 +17,7 @@ export const uploadSong = async (req, res) => {
         uploadFile({
             buffer: tags.image.imageBuffer,
             fileName: tags.title + '.jpeg',
-            folder: "/Gandharvika/thumbnails"
+            folder: "/Gandharvika/thumbnail"
         })
     ]);
 
@@ -39,7 +39,7 @@ export const uploadSong = async (req, res) => {
 
 export const getSongs = async (req, res) => {
     const { mood } = req.query;
-    const songs = await songModel.findOne({ mood });
+    const songs = await songModel.find({ mood });
 
     res.status(200).json({
         success: true,

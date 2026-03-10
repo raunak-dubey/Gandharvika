@@ -13,13 +13,9 @@ const Home = () => {
 
       <main className="home-main">
         <div className="home-container">
-
           <MusicHeader />
-
           <FaceExpression />
-
           <MusicGrid />
-
         </div>
       </main>
 

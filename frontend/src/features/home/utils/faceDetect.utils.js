@@ -1,22 +1,22 @@
 import * as faceapi from "face-api.js";
 
-export const detectFaceExpression = async (imageRef) => {
-    if (!imageRef.current || imageRef.current.readyState !== 4) {
+export const detectFaceExpression = async (videoRef) => {
+    if (!videoRef.current || videoRef.current.readyState !== HTMLMediaElement.HAVE_ENOUGH_DATA) {
         console.log("Video not ready");
         return;
     }
 
     const detection = await faceapi
         .detectAllFaces(
-            imageRef.current,
+            videoRef.current,
             new faceapi.TinyFaceDetectorOptions({ inputSize: 320 }),
         )
         .withFaceLandmarks()
         .withFaceExpressions();
 
     if (!detection.length) {
-        console.log("No face detected");
-        return;
+        alert("No face detected. Try again.");
+        return null;
     }
 
     const expressions = detection[0].expressions;
@@ -26,4 +26,5 @@ export const detectFaceExpression = async (imageRef) => {
     );
 
     console.log("Detected mood:", mood);
+    return mood;
 };

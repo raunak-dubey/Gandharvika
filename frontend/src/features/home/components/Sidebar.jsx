@@ -1,4 +1,4 @@
-import { Home, Compass, Library, Plus, ThumbsUp } from "lucide-react";
+import { Home, Compass, Library, ThumbsUp } from "lucide-react";
 import "../styles/sidebar.scss";
 import { NavLink } from 'react-router'
 
