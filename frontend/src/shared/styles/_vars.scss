@@ -1,16 +1,20 @@
 // ? Colors
-$bg: #141619;
-$text: #fafafa;
-$muted: #94979c;
-$accent: #7c38f1;
-$accent-2: #874bef;
-$bg-tint: #191919;
+$bg: #0f1115;
+$text: #f3f4f6;
+$muted: #8b8f97;
 
+$accent: #6d4aff;
+$accent-2: #8a6bff;
+
+$bg-tint: #181b21;
+
+// ? Layouts
 $gap: 1rem;
 $gap-sm: 0.5rem;
-$radius: 10px;
+$radius: 0.75rem;
 
-$card-border: 1px solid $bg-tint;
-$hover: rgba(255, 255, 255, 0.05);
-$shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+// ? UI tokens
+$card-border: 1px solid rgba(255, 255, 255, 0.04);
+$hover: rgba(255, 255, 255, 0.08);
+$shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
 $container-width: 87rem;

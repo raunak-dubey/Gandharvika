@@ -1,0 +1,68 @@
+.sidebar {
+  width: 15rem;
+  background: $bg;
+  padding: 1.5rem 1rem;
+  transition: width 0.2s ease;
+  border: $card-border;
+
+  &-logo {
+    margin-bottom: 2rem;
+    text-align: center;
+
+    &-text {
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+    }
+  }
+
+  &-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  &-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+
+    padding: 0.6rem 0.8rem;
+    border-radius: $radius;
+
+    color: $muted;
+    text-decoration: none;
+    font-size: 0.95rem;
+
+    transition:
+      background 0.2s ease,
+      color 0.2s ease;
+
+    &:hover {
+      background: $hover;
+      color: $text;
+    }
+
+    &.active {
+      background: $bg-tint;
+      color: $text;
+    }
+
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  .sidebar-icon {
+    font-size: 1.2rem;
+  }
+
+  .sidebar-footer {
+    margin-top: 2rem;
+
+    .footer-text {
+      font-size: 0.8rem;
+      color: $muted;
+    }
+  }
+}

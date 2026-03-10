@@ -1,0 +1,27 @@
+.music-header {
+  @include center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+
+  .search-container input {
+    background: $bg-tint;
+    border: none;
+    padding: 0.7rem 1rem;
+    border-radius: $radius;
+    color: $text;
+    width: 500px;
+
+    &:focus {
+      outline: 1px solid $accent;
+    }
+  }
+
+  .profile-avatar {
+    @include center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: $accent;
+    cursor: pointer;
+  }
+}

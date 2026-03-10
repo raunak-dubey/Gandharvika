@@ -1,0 +1,37 @@
+.music-player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 1rem 2rem;
+  background: $bg-tint;
+  border-top: $card-border;
+
+  .player-controls {
+    display: flex;
+    gap: 1rem;
+
+    button {
+      background: none;
+      border: none;
+      color: $text;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .play-btn {
+      background: $accent;
+      padding: .5rem .9rem;
+      border-radius: 50%;
+    }
+  }
+
+  .progress-bar input {
+    width: 200px;
+  }
+}

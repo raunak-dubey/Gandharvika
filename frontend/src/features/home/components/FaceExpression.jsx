@@ -1,9 +1,11 @@
 import * as faceapi from "face-api.js";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { detectFaceExpression } from "../utils/faceDetect.utils";
+import "../styles/expression.scss";
 
 const FaceExpression = () => {
   const imageRef = useRef(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const start = async () => {
@@ -15,13 +17,39 @@ const FaceExpression = () => {
     start();
   }, []);
 
+  const handleDetect = async () => {
+    setLoading(true);
+
+    await detectFaceExpression(imageRef);
+    setLoading(false);
+  };
+
   return (
-    <>
-      <image ref={imageRef} src="/seedheMaut.png" width="400"  height="400" />
-      <div className="btn" onClick={() => detectFaceExpression(imageRef)}>
-        Detect
+    <section className="expression-section">
+      <div className="expression-preview">
+        <img
+          ref={imageRef}
+          src="/seedheMaut.png"
+          width="300"
+          height="300"
+          alt="expression source"
+          className="expression-image"
+        />
       </div>
-    </>
+      <div className="expression-controls">
+        <h2 className="heading">Detect Your Mood</h2>
+
+        <p className="sub-text">
+          Detect your facial expression and get music recommendations.
+        </p>
+        <button
+          className={`detect-btn ${loading ? "loading" : ""}`}
+          onClick={handleDetect}
+        >
+          {loading ? "Detecting..." : "Detect Expression"}
+        </button>
+      </div>
+    </section>
   );
 };
 

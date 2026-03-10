@@ -1,4 +1,2 @@
 node_modules/
 .env
-frontend/src/features/home/components/Sidebar.jsx
-frontend/src/features/home/styles/sidebar.module.scss

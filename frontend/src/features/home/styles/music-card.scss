@@ -1,0 +1,39 @@
+.music-card {
+  cursor: pointer;
+
+  .cover {
+    background: $bg-tint;
+    border: $card-border;
+    height: 180px;
+    border-radius: $radius;
+    position: relative;
+    overflow: hidden;
+
+    .play-overlay {
+      @include center;
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      font-size: 2rem;
+      transition: 0.2s;
+    }
+  }
+
+  &:hover {
+
+    .play-overlay {
+      opacity: 1;
+      background: rgba(0,0,0,0.4);
+    }
+
+  }
+
+  .music-title {
+    margin-top: .5rem;
+  }
+
+  .music-artist {
+    color: $muted;
+    font-size: .9rem;
+  }
+}
