@@ -9,7 +9,7 @@ const FaceExpression = () => {
   const [loading, setLoading] = useState(false);
   const [cameraError, setCameraError] = useState(false);
 
-  const { handleFetchSongs } = useSong();
+  const { handleFetchSongs, setCameraAvailable } = useSong();
 
   useEffect(() => {
     handleFetchSongs("neutral");
@@ -24,9 +24,11 @@ const FaceExpression = () => {
           video: true,
         });
 
+        setCameraAvailable(true);
         videoRef.current.srcObject = stream;
       } catch {
         setCameraError(true);
+        setCameraAvailable(false);
         console.warn("Camera not available");
       }
     };

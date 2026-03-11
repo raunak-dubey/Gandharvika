@@ -1,13 +1,15 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import "../styles/form.scss";
 import FormField from "./FormField";
 import useAuth from "../hooks/useAuth";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Form = ({ mode }) => {
   const isLogin = mode === "login";
 
-  const { loading, handleLogin, handleRegister } = useAuth();
+  const { loading, handleLogin, handleRegister, user } = useAuth();
+
+  const navigate = useNavigate();
 
   // ? set formData value
   const [formData, setFormData] = useState({
@@ -71,6 +73,12 @@ const Form = ({ mode }) => {
       setFormError(err.message || "Something went wrong");
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
   return (
     <main className="auth-page">
       <div className="auth-form-container">

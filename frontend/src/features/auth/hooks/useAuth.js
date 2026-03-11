@@ -45,11 +45,10 @@ const useAuth = () => {
         try {
             const response = await getMeApi();
             setUser(response.user);
-            navigate("/");
         } finally {
             setLoading(false);
         }
-    }, [setLoading, setUser, navigate]);
+    }, [setLoading, setUser]);
 
     useEffect(() => {
         handleGetMe();

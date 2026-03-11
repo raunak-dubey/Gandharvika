@@ -1,5 +1,6 @@
 .music-card {
   cursor: pointer;
+  position: relative;
 
   .cover {
     background: $bg-tint;
@@ -26,20 +27,38 @@
   }
 
   &:hover {
-
     .play-overlay {
       opacity: 1;
-      background: rgba(0,0,0,0.4);
+      background: rgba(0, 0, 0, 0.4);
     }
-
   }
 
   .music-title {
-    margin-top: .5rem;
+    margin-top: 0.5rem;
   }
 
   .music-artist {
     color: $muted;
-    font-size: .9rem;
+    font-size: 0.9rem;
+  }
+
+  .like-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 5;
+
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    border-radius: 50%;
+    padding: 6px;
+    cursor: pointer;
+
+    color: white;
+    transition: 0.2s;
+  }
+
+  .like-btn.liked {
+    color: #ff4d6d;
   }
 }

@@ -10,15 +10,15 @@ const MusicPlayer = () => {
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [volume, setVolume] = useState(1);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
 
   useEffect(() => {
     if (!currentSong || !audioRef.current) return;
 
     const audio = audioRef.current;
     audio.src = currentSong.url;
-    audio.play().catch(() => {
-      console.warn("Autoplay blocked by browser");
-    });
+    audio.load();
   }, [currentSong]);
 
   useEffect(() => {
@@ -41,23 +41,44 @@ const MusicPlayer = () => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    if (audio.paused) audio.play();
-    else audio.pause();
-
-    setPlaying(!playing);
+    if (audio.paused) {
+      audio.play();
+      setPlaying(true);
+    } else {
+      audio.pause();
+      setPlaying(false);
+    }
   };
 
   const handleTimeUpdate = () => {
-    const current = audioRef.current.currentTime;
-    const duration = audioRef.current.duration;
+    const audio = audioRef.current;
+    if (!audio) return;
 
+    const current = audio.currentTime;
+    const duration = audio.duration;
+
+    if (!duration || isNaN(duration)) return;
+
+    setCurrentTime(current);
+    setDuration(duration);
     setProgress((current / duration) * 100);
   };
 
+  const formatTime = (time) => {
+    const mins = Math.floor(time / 60);
+    const secs = Math.floor(time % 60);
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
   const handleSeek = (e) => {
-    const time = (e.target.value / 100) * audioRef.current.duration;
-    audioRef.current.currentTime = time;
-    setProgress(e.target.value);
+    const audio = audioRef.current;
+    if (!audio || !audio.duration) return;
+
+    const value = Number(e.target.value);
+    const time = (value / 100) * audio.duration;
+
+    audio.currentTime = time;
+    setProgress(value);
   };
 
   const handleVolume = (e) => {
@@ -70,7 +91,11 @@ const MusicPlayer = () => {
 
   return (
     <div className="music-player">
-      <audio ref={audioRef} onTimeUpdate={handleTimeUpdate} />
+      <audio
+        ref={audioRef}
+        onTimeUpdate={handleTimeUpdate}
+        onEnded={playNext}
+      />
 
       <div className="song-info">
         <img
@@ -79,36 +104,38 @@ const MusicPlayer = () => {
           className="cover-small"
         />
 
-        <div>
+        <div className="song-text">
           <h4>{currentSong.title}</h4>
           <p>{currentSong.artist}</p>
         </div>
       </div>
 
       <div className="player-center">
-      <div className="player-controls">
-        <button onClick={playPrev}>
-          <SkipBack size={20} />
-        </button>
+        <div className="player-controls">
+          <button onClick={playPrev}>
+            <SkipBack size={18} />
+          </button>
 
-        <button className="play-btn" onClick={togglePlay}>
-          {playing ? <Pause size={22} /> : <Play size={22} />}
-        </button>
+          <button className={`play-btn ${playing ? 'active' : ''}`} onClick={togglePlay}>
+            {playing ? <Pause size={24} /> : <Play size={24} />}
+          </button>
 
-        <button onClick={playNext}>
-          <SkipForward size={20} />
-        </button>
-      </div>
+          <button onClick={playNext}>
+            <SkipForward size={18} />
+          </button>
+        </div>
 
-      <div className="progress-bar">
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={progress}
-          onChange={handleSeek}
-        />
-      </div>
+        <div className="progress-wrapper">
+          <span>{formatTime(currentTime)}</span>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={progress}
+            onChange={handleSeek}
+          />
+          <span>{formatTime(duration)}</span>
+        </div>
       </div>
 
       <div className="volume-control">

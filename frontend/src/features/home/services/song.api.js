@@ -12,12 +12,66 @@ const handleError = (err, fallback) => {
     throw new Error(fallback);
 };
 
-export const fetchSongs = async (detectedMood) => {
+// ? Get all songs
+export const fetchSongs = async (mood) => {
   try {
-    const response = await songApi.get('/song?mood=' + detectedMood)
+    const response = await songApi.get(`/song?mood=${mood}`);
     return response.data
 
   } catch (err) {
-    return handleError(err, 'Failed to fetch songs')
+    handleError(err, 'Failed to fetch songs')
   }
 }
+
+// ? Recommend songs based on mood
+export const fetchRecommendations = async (mood) => {
+  try {
+    const response = await songApi.get(`/song/recommend?mood=${mood}`);
+    return response.data
+
+  } catch (err) {
+    handleError(err, 'Failed to fetch songs')
+  }
+};
+
+// ? Like Song
+export const likeSong = async (songId) => {
+  try {
+    const response = await songApi.post(`/song/like/${songId}`);
+    return response.data
+
+  } catch (err) {
+    handleError(err, 'Failed to like song')
+  }
+};
+
+export const fetchLikedSong = async () => {
+  try {
+    const response = await songApi.get(`/song/liked`);
+    return response.data
+
+  } catch (err) {
+    handleError(err, 'Failed to like song')
+  }
+};
+
+// ? history
+export const fetchHistory = async () => {
+  try {
+    const response = await songApi.get(`/history`);
+    return response.data
+
+  } catch (err) {
+    handleError(err, 'Failed to fetch history')
+  }
+};
+
+export const logSongPlay = async (songId, mood) => {
+  try {
+    const response = await songApi.post(`/history/play/${songId}`, {mood});
+    return response.data
+
+  } catch (err) {
+    handleError(err, 'Failed to log song play')
+  }
+};

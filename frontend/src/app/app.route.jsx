@@ -3,6 +3,8 @@ import Login from "../features/auth/pages/Login";
 import Register from "../features/auth/pages/Register";
 import Protected from "./Protected";
 import Home from "../features/home/pages/Home";
+import LikedSongs from "../features/home/pages/LikedSong";
+import History from "../features/home/components/History";
 
 const router = createBrowserRouter([
   {
@@ -10,6 +12,22 @@ const router = createBrowserRouter([
     element: (
       <Protected>
         <Home />
+      </Protected>
+    ),
+  },
+  {
+    path: "/liked",
+    element: (
+      <Protected>
+        <LikedSongs />
+      </Protected>
+    ),
+  },
+  {
+    path: "/history",
+    element: (
+      <Protected>
+        <History />
       </Protected>
     ),
   },

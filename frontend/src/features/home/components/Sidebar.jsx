@@ -1,13 +1,13 @@
-import { Home, Compass, Library, ThumbsUp } from "lucide-react";
+import { Home, Compass, ThumbsUp, History } from "lucide-react";
 import "../styles/sidebar.scss";
-import { NavLink } from 'react-router'
+import { NavLink } from "react-router";
 
 const Sidebar = () => {
   const navItems = [
-    { icon: <Home size={20} />, label: "Home", active: true, path: '/' },
-    { icon: <Compass size={20} />, label: "Explore", path: '/explore' },
-    { icon: <Library size={20} />, label: "Library", path: '/library' },
-    { icon: <ThumbsUp size={20} />, label: "Liked Song", path: '/liked' },
+    { icon: <Home size={20} />, label: "Home", active: true, path: "/" },
+    { icon: <Compass size={20} />, label: "Explore", path: "/explore" },
+    { icon: <History size={20} />, label: "History", path: "/history" },
+    { icon: <ThumbsUp size={20} />, label: "Liked Song", path: "/liked" },
   ];
 
   return (
@@ -21,7 +21,9 @@ const Sidebar = () => {
           <NavLink
             key={index}
             to={item.path}
-            className={`sidebar-item ${item.active ? "active" : ""}`}
+            className={({ isActive }) =>
+              `sidebar-item ${isActive ? "active" : ""}`
+            }
           >
             <span className="sidebar-icon">{item.icon}</span>
             <span className="sidebar-label">{item.label}</span>
@@ -30,11 +32,7 @@ const Sidebar = () => {
       </nav>
 
       <div className="sidebar-footer">
-
-        <p className="footer-text">
-          Emotion based music
-        </p>
-
+        <p className="footer-text">Emotion based music</p>
       </div>
     </aside>
   );
