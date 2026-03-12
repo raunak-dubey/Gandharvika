@@ -1,6 +1,9 @@
 import Router from 'express';
 import { registerUserController, loginUserController, getMeController, logoutUserController } from '../controller/auth.controller.js';
+
 import authMiddleware from '../middlewares/auth.middleware.js';
+import { loginUserValidator, registerUserValidator } from '../middlewares/validators/auth.validator.js';
+import { validate } from '../middlewares/validator.middleware.js';
 
 const authRouter = Router();
 
@@ -8,13 +11,13 @@ const authRouter = Router();
  @routes POST /api/auth/register
  @desc Register a new user to database
  */
-authRouter.post('/register', registerUserController);
+authRouter.post('/register', registerUserValidator, validate, registerUserController);
 
 /**
  @routes POST /api/auth/login
  @desc Login a user
  */
-authRouter.post('/login', loginUserController);
+authRouter.post('/login', loginUserValidator, validate, loginUserController);
 
 /**
  @routes Get /api/auth/get-me

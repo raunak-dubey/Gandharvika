@@ -1,43 +1,29 @@
 import jwt from 'jsonwebtoken';
 import redis from '../config/cache.config.js'
+import ApiError from '../utils/ApiError.js';
+import asyncHandler from '../utils/asyncHandler.js';
 
-const authMiddleware = async (req, res, next) => {
+const authMiddleware = asyncHandler(async (req, res, next) => {
     const token = req.cookies?.token;
 
     if (!token) {
-        return res.status(401).json({
-            success: false,
-            message: 'Access denied. No token provided.'
-        })
+        throw new ApiError(401, 'Access denied. No token provided.');
     }
 
-    let isTokenBlacklisted;
-
-    try {
-        isTokenBlacklisted = await redis.get(token);
-    } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: "Authentication service unavailable."
-        });
-    }
+    let isTokenBlacklisted = await redis.get(token);
 
     if (isTokenBlacklisted) {
-        return res.status(401).json({
-            success: false,
-            message: 'Invalid token.'
-        })
+        throw new ApiError(401, 'Access denied. Invalid Token.');
     }
+
+    let decoded;
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        req.user = decoded;
-        next();
+        decoded = jwt.verify(token, process.env.JWT_SECRET)
     } catch (err) {
-        return res.status(401).json({
-            success: false,
-            message: 'Invalid token.'
-        });
+        throw new ApiError(401, 'Access denied. Invalid Token.');
     }
-}
+    req.user = decoded;
+    next();
+});
 
 export default authMiddleware;

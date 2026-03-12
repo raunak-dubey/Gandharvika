@@ -5,6 +5,7 @@ import authRouter from './routes/auth.route.js';
 import songRouter from './routes/song.route.js';
 import listeningHistoryRouter from './routes/listeningHistory.route.js';
 import moodLogRouter from './routes/mood.route.js';
+import errorHandler from './middlewares/errorHandler.middleware.js';
 
 const app = express();
 app.use(express.json());
@@ -18,5 +19,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/song', songRouter);
 app.use('/api/history', listeningHistoryRouter);
 app.use('/api/mood', moodLogRouter);
+
+app.use(errorHandler)
 
 export default app;
