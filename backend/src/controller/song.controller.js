@@ -102,22 +102,32 @@ export const getRecommendedSongs = asyncHandler(async (req, res) => {
     }
 
     const [moodSongs, likedSongs, popular, historySongs] = await Promise.all([
-        songModel.find({ mood }).sort({ playCount: -1 }).limit(10),
+        songModel.aggregate([
+            { $match: { mood } },
+            { $sort: { playCount: -1 } },
+            { $sample: { size: 10 } }
+        ]),
+
         songLikeModel.find({ user: userId }).populate("song").limit(5),
-        songModel.find().sort({ playCount: -1 }).limit(5),
+
+        songModel.aggregate([
+            { $sort: { playCount: -1 } },
+            { $sample: { size: 5 } }
+        ]),
         listeningHistoryModel.find({ user: userId }).populate("song").limit(20),
     ]);
 
     const tags = historySongs.flatMap(h => h.song?.tags || []);
-    const tagSongs = await songModel.find({
-        tags: { $in: tags }
-    }).limit(10);
+    const tagSongs = await songModel.aggregate([
+        { $match: { tags: { $in: tags } } },
+        { $sample: { size: 10 } }
+    ]);
 
     const recommendations = [
-        ...moodSongs,
-        ...likedSongs.map(l => l.song),
         ...historySongs.map(h => h.song),
+        ...likedSongs.map(l => l.song),
         ...tagSongs,
+        ...moodSongs,
         ...popular
     ];
 

@@ -119,7 +119,7 @@ const MusicPlayer = () => {
 
       <div className="player-center">
         <div className="player-controls">
-          <button onClick={playPrev}>
+          <button onClick={playPrev} disabled={!currentSong}>
             <SkipBack size={18} />
           </button>
 
@@ -130,7 +130,7 @@ const MusicPlayer = () => {
             {playing ? <Pause size={24} /> : <Play size={24} />}
           </button>
 
-          <button onClick={playNext}>
+          <button onClick={playNext} disabled={!currentSong}>
             <SkipForward size={18} />
           </button>
         </div>

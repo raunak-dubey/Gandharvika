@@ -4,13 +4,13 @@ import MusicSection from "../components/music/MusicSection";
 import "../styles/history.scss";
 
 const History = () => {
-  const { history, moodLogs, getHistoryPageData } = useSong();
+  const { history, moodLogs, loadHistoryPage } = useSong();
   const hasHistory = history.length > 0;
   const hasMoodLogs = Array.isArray(moodLogs) && moodLogs.length > 0;
 
   useEffect(() => {
-    getHistoryPageData();
-  }, [getHistoryPageData]);
+    loadHistoryPage();
+  }, [loadHistoryPage]);
 
   return (
     <>

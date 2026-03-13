@@ -1,58 +1,53 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { detectFaceExpression } from "../utils/faceDetect.utils";
 import "../styles/expression.scss";
 import useSong from "../hooks/useSong";
 import { loadFaceModels } from "../utils/faceApi.utils";
+import { startCamera, stopCamera } from "../utils/camera.utils";
 
 const FaceExpression = () => {
-  const videoRef = useRef(null);  
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+
   const [loading, setLoading] = useState(false);
   const [cameraError, setCameraError] = useState(false);
 
-  const { handleFetchSongs, setCameraAvailable } = useSong();
+  const { handleFetchSongs, setCameraAvailable, songs } = useSong();
+
+  const handleDetect = useCallback(async () => {
+    if (!videoRef.current) return;
+    setLoading(true);
+
+    try {
+      const mood = await detectFaceExpression(videoRef.current);
+      if (mood) {
+        await handleFetchSongs(mood);
+      }
+    } catch (err) {
+      console.error("Detection failed", err);
+    }
+    setLoading(false);
+  }, [handleFetchSongs]);
 
   useEffect(() => {
-    handleFetchSongs("neutral");
-
-    let stream;
-
-    const start = async () => {
+    const init = async () => {
       await loadFaceModels();
 
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-        });
+      if (!songs.length) await handleFetchSongs("neutral");
 
+      try {
+        const stream = await startCamera(videoRef.current);
+        streamRef.current = stream;
         setCameraAvailable(true);
-        videoRef.current.srcObject = stream;
       } catch {
         setCameraError(true);
         setCameraAvailable(false);
-        console.warn("Camera not available");
       }
     };
+    init();
 
-    start();
-
-    return () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
-      }
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleDetect = async () => {
-    setLoading(true);
-
-    const mood = await detectFaceExpression(videoRef);
-    if (mood) {
-      await handleFetchSongs(mood);
-    }
-
-    setLoading(false);
-  };
+    return () => stopCamera(streamRef.current);
+  }, [songs.length, handleFetchSongs, setCameraAvailable]);
 
   return (
     <section className="expression-section">
@@ -66,7 +61,6 @@ const FaceExpression = () => {
           <div className="expression-preview">
             <video
               ref={videoRef}
-              alt="expression source"
               className="expression-image"
               autoPlay
               muted

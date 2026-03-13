@@ -17,18 +17,18 @@ const useHistory = () => {
   const logPlay = useCallback(async (song) => {
     if (!song) return;
     try {
-    await logSongPlay(song._id, mood);
-    setHistory((prev) => {
-      const existing = prev.find((h) => h.song._id === song._id);
-      if (existing) {
-        return prev.map(h =>
-          h.song._id === song._id
-            ? { ...h, plays: (h.plays || 1) + 1 }
-            : h
-        );
-      }
-      return [{ song, mood, playedAt: new Date(), plays: 1 }, ...prev];
-    });
+      await logSongPlay(song._id, mood);
+      setHistory((prev) => {
+        const existing = prev.find((h) => h.song._id === song._id);
+        if (existing) {
+          return prev.map(h =>
+            h.song._id === song._id
+              ? { ...h, plays: (h.plays || 1) + 1 }
+              : h
+          );
+        }
+        return [{ song, mood, playedAt: new Date(), plays: 1 }, ...prev];
+      });
     } catch (error) {
       console.error(error);
     }

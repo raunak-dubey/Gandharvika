@@ -1,14 +1,14 @@
 import * as faceapi from "face-api.js";
 
-export const detectFaceExpression = async (videoRef) => {
-    if (!videoRef.current || videoRef.current.readyState !== HTMLMediaElement.HAVE_ENOUGH_DATA) {
+export const detectFaceExpression = async (video) => {
+    if (!video || video.readyState !== HTMLMediaElement.HAVE_ENOUGH_DATA) {
         console.log("Video not ready");
         return;
     }
 
     const detection = await faceapi
         .detectAllFaces(
-            videoRef.current,
+            video,
             new faceapi.TinyFaceDetectorOptions({ inputSize: 320 }),
         )
         .withFaceLandmarks()
