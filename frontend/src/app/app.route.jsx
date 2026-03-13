@@ -2,34 +2,50 @@ import { createBrowserRouter } from "react-router";
 import Login from "../features/auth/pages/Login";
 import Register from "../features/auth/pages/Register";
 import Protected from "./Protected";
+
 import Home from "../features/home/pages/Home";
 import LikedSongs from "../features/home/pages/LikedSong";
 import History from "../features/home/pages/History";
+import Upload from "../features/home/pages/Upload";
+import AppLayout from "../features/home/layout/AppLayout";
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: (
-      <Protected>
-        <Home />
-      </Protected>
-    ),
-  },
-  {
-    path: "/liked",
-    element: (
-      <Protected>
-        <LikedSongs />
-      </Protected>
-    ),
-  },
-  {
-    path: "/history",
-    element: (
-      <Protected>
-        <History />
-      </Protected>
-    ),
+    element: <AppLayout />,
+    children: [
+      {
+        path: "/",
+        element: (
+          <Protected>
+            <Home />
+          </Protected>
+        ),
+      },
+      {
+        path: "/liked",
+        element: (
+          <Protected>
+            <LikedSongs />
+          </Protected>
+        ),
+      },
+      {
+        path: "/history",
+        element: (
+          <Protected>
+            <History />
+          </Protected>
+        ),
+      },
+      {
+        path: "/upload",
+        element: (
+          <Protected>
+            <Upload />
+          </Protected>
+        ),
+      },
+    ],
   },
   {
     path: "/login",

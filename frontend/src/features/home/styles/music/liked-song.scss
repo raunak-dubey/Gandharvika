@@ -1,0 +1,12 @@
+.liked-container {
+  max-width: $container-width;
+  margin: 0 auto;
+}
+
+//// ============== EMPTY STATE ============== ////
+.liked-empty {
+  margin-top: 4rem;
+  text-align: center;
+
+  color: $muted;
+}

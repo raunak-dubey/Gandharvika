@@ -18,11 +18,14 @@ export const playSong = asyncHandler(async (req, res) => {
     }
 
 
-    await listeningHistoryModel.create({
-        user: userId,
-        song: songId,
-        detectedMood: mood,
-    });
+    await listeningHistoryModel.findOneAndUpdate(
+        { user: userId, song: songId },
+        {
+            $inc: { playCount: 1 },
+            $set: { detectedMood: mood, playedAt: new Date() }
+        },
+        { upsert: true, returnDocument: 'after' }
+    );
 
     await songModel.findByIdAndUpdate(songId, { $inc: { playCount: 1 } });
 

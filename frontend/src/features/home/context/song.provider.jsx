@@ -1,32 +1,23 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import SongContext from "./song.context";
-import { fetchLikedSong } from "../services/song.api";
 
 const SongProvider = ({ children }) => {
+  // song data
   const [songs, setSongs] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
   const [likedSongs, setLikedSongs] = useState([]);
   const [history, setHistory] = useState([]);
 
+  // Ui State
   const [loading, setLoading] = useState(false);
+  const [cameraAvailable, setCameraAvailable] = useState(true);
+
+  // Mood State
   const [mood, setMood] = useState(null);
   const [moodLogs, setMoodLogs] = useState([]);
 
+  // Player State
   const [currentSong, setCurrentSong] = useState(null);
-  const [cameraAvailable, setCameraAvailable] = useState(true);
-
-  useEffect(() => {
-    const loadLikedSongs = async () => {
-      try {
-        const data = await fetchLikedSong();
-        setLikedSongs(data?.songs || []);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    loadLikedSongs();
-  }, []);
 
   const value = useMemo(
     () => ({

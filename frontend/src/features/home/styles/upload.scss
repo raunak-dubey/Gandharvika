@@ -1,0 +1,102 @@
+.upload-container {
+  width: 100%;
+  max-width: $container-width;
+
+  @include center-column;
+}
+
+.page-title {
+  font-size: 1.7rem;
+  margin-bottom: 2rem;
+}
+
+/* CARD */
+
+.upload-card {
+  width: 100%;
+  max-width: 28rem;
+
+  background: $bg-tint;
+  border: $card-border;
+  border-radius: $radius;
+
+  padding: 2rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* FILE INPUT STYLE (like CreatePost) */
+
+.upload-file-label {
+  padding-block: 3rem;
+
+  border-radius: $radius;
+  background-color: $bg;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border: 1px dashed $muted;
+
+  color: $muted;
+  font-size: .9rem;
+
+  cursor: pointer;
+  transition: all .15s ease;
+
+  &:hover {
+    border-color: $accent;
+    color: $accent;
+  }
+}
+
+/* FORM */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+
+  label {
+    font-size: .85rem;
+    color: $muted;
+  }
+
+  input,
+  select {
+    padding: .6rem .7rem;
+
+    background: $bg;
+    border: $card-border;
+    border-radius: $radius;
+
+    color: $text;
+    font-size: .9rem;
+  }
+}
+
+/* BUTTON */
+
+.upload-btn {
+  margin-top: .6rem;
+
+  background: $accent;
+  color: white;
+
+  border: none;
+  border-radius: $radius;
+
+  padding: .7rem 1rem;
+
+  font-weight: 500;
+  cursor: pointer;
+
+  transition: transform .15s ease;
+
+  &:hover {
+    transform: translateY(-.1rem);
+  }
+}

@@ -55,31 +55,17 @@ export const fetchLikedSong = async () => {
   }
 };
 
-// ? history
-export const fetchHistory = async () => {
+export const uploadSong = async (file, mood, tags) => {
   try {
-    const response = await songApi.get(`/history`);
-    return response.data
-  } catch (err) {
-    handleError(err, 'Failed to fetch history')
-  }
-};
+    const formData = new FormData();
 
-export const logSongPlay = async (songId, mood) => {
-  try {
-    const response = await songApi.post(`/history/play/${songId}`, {mood});
-    return response.data
-  } catch (err) {
-    handleError(err, 'Failed to log song play')
-  }
-};
+    formData.append("song", file);
+    formData.append("mood", mood);
+    formData.append("tags", tags);
 
-// ? Mood logs
-export const fetchMoodLogs = async () => {
-  try {
-    const response = await songApi.get(`/mood/log`);
+    const response = await songApi.post(`/song`, formData);
     return response.data
   } catch (err) {
-    handleError(err, 'Failed to fetch mood logs')
+    handleError(err, 'Failed to upload song')
   }
 };

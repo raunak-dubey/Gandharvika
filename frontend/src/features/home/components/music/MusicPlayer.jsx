@@ -1,5 +1,5 @@
 import { Play, Pause, SkipBack, SkipForward, Volume2 } from "lucide-react";
-import "../../styles/music-player.scss";
+import "../../styles/music/music-player.scss";
 import { useEffect, useRef, useState } from "react";
 import useSong from "../../hooks/useSong";
 
@@ -17,8 +17,13 @@ const MusicPlayer = () => {
     if (!currentSong || !audioRef.current) return;
 
     const audio = audioRef.current;
-    audio.src = currentSong.url;
+    audio.src = currentSong.audioUrl;
     audio.load();
+
+    audio
+      .play()
+      .then(() => setPlaying(true))
+      .catch(() => setPlaying(false));
   }, [currentSong]);
 
   useEffect(() => {
@@ -82,7 +87,7 @@ const MusicPlayer = () => {
   };
 
   const handleVolume = (e) => {
-    const value = e.target.value;
+    const value = Number(e.target.value);
     audioRef.current.volume = value;
     setVolume(value);
   };
@@ -93,6 +98,8 @@ const MusicPlayer = () => {
     <div className="music-player">
       <audio
         ref={audioRef}
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
         onTimeUpdate={handleTimeUpdate}
         onEnded={playNext}
       />
@@ -116,7 +123,10 @@ const MusicPlayer = () => {
             <SkipBack size={18} />
           </button>
 
-          <button className={`play-btn ${playing ? 'active' : ''}`} onClick={togglePlay}>
+          <button
+            className={`play-btn ${playing ? "active" : ""}`}
+            onClick={togglePlay}
+          >
             {playing ? <Pause size={24} /> : <Play size={24} />}
           </button>
 

@@ -8,19 +8,13 @@ import "../styles/home.scss";
 
 const Home = () => {
   return (
-    <div className="home-page">
-      <Sidebar />
-
-      <main className="home-main">
-        <div className="home-container">
-          <MusicHeader />
-          <FaceExpression />
-          <MusicGrid />
-        </div>
-      </main>
-
-      <MusicPlayer />
-    </div>
+    <>
+      <div className="home-container">
+        <MusicHeader />
+        <FaceExpression />
+        <MusicGrid />
+      </div>
+    </>
   );
 };
 

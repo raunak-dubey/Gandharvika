@@ -1,4 +1,4 @@
-import "../../styles/music-grid.scss";
+import "../../styles/music/music-grid.scss";
 import useSong from "../../hooks/useSong";
 import { useEffect } from "react";
 import MusicSection from "./MusicSection";

@@ -1,5 +1,5 @@
 import useSong from "../../hooks/useSong";
-import "../../styles/music-card.scss";
+import "../../styles/music/music-card.scss";
 import { Heart } from "lucide-react";
 
 const MusicCard = ({ song }) => {

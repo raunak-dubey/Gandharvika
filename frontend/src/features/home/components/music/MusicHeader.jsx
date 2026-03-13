@@ -1,4 +1,4 @@
-import "../../styles/header.scss";
+import "../../styles/music/header.scss";
 import { useState } from "react";
 
 const MusicHeader = () => {
