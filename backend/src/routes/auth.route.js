@@ -11,13 +11,13 @@ const authRouter = Router();
  @routes POST /api/auth/register
  @desc Register a new user to database
  */
-authRouter.post('/register', registerUserValidator, validate, registerUserController);
+authRouter.post('/register', validate, registerUserValidator, registerUserController);
 
 /**
  @routes POST /api/auth/login
  @desc Login a user
  */
-authRouter.post('/login', loginUserValidator, validate, loginUserController);
+authRouter.post('/login', validate, loginUserController, loginUserController);
 
 /**
  @routes Get /api/auth/get-me

@@ -1,0 +1,94 @@
+.history-page {
+  display: flex;
+  min-height: 130vh;
+
+  background:
+    radial-gradient(circle at 40% 0%, rgba($accent, 0.25), transparent 50%),
+    $bg;
+}
+
+.history-main {
+  flex: 1;
+  overflow-y: auto;
+
+  padding: 2rem 3rem;
+}
+
+.history-container {
+  max-width: $container-width;
+  margin: 0 auto;
+}
+
+/* EMPTY STATE */
+
+.history-empty {
+  margin-top: 4rem;
+  text-align: center;
+
+  color: $muted;
+}
+
+//// ============== MOOD HISTORY  ============== ////
+
+.mood-history {
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+}
+
+/* GRID */
+
+.mood-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 1rem;
+}
+
+/* CARD */
+
+.mood-card {
+  padding: 0.9rem 1rem;
+
+  background: $bg-tint;
+  border: $card-border;
+  border-radius: $radius;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+
+  transition: transform .15s ease;
+
+  &:hover {
+    transform: translateY(-0.15rem);
+  }
+}
+
+.mood-name {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.mood-time {
+  font-size: 0.8rem;
+  color: $muted;
+}
+
+/* EMPTY */
+
+.mood-empty {
+  padding: 1.5rem;
+  border: $card-border;
+  border-radius: $radius;
+  background: $bg-tint;
+
+  text-align: center;
+  color: $muted;
+
+  span {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+  }
+}

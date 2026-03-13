@@ -60,7 +60,6 @@ export const fetchHistory = async () => {
   try {
     const response = await songApi.get(`/history`);
     return response.data
-
   } catch (err) {
     handleError(err, 'Failed to fetch history')
   }
@@ -70,8 +69,17 @@ export const logSongPlay = async (songId, mood) => {
   try {
     const response = await songApi.post(`/history/play/${songId}`, {mood});
     return response.data
-
   } catch (err) {
     handleError(err, 'Failed to log song play')
+  }
+};
+
+// ? Mood logs
+export const fetchMoodLogs = async () => {
+  try {
+    const response = await songApi.get(`/mood/log`);
+    return response.data
+  } catch (err) {
+    handleError(err, 'Failed to fetch mood logs')
   }
 };

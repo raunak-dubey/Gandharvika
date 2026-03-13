@@ -10,7 +10,7 @@ import asyncHandler from '../utils/asyncHandler.js';
 export const playSong = asyncHandler(async (req, res) => {
     const { songId } = req.params;
     const { mood } = req.body;
-    const userId = req.user._id;
+    const userId = req.user.id;
 
     const song = await songModel.findById(songId);
     if (!song) {
@@ -37,7 +37,7 @@ export const playSong = asyncHandler(async (req, res) => {
  @desc Get listening history
 */
 export const getListeningHistory = asyncHandler(async (req, res) => {
-    const userId = req.user._id
+    const userId = req.user.id
     const history = await listeningHistoryModel.find({ user: userId })
         .populate("song")
         .sort({ createdAt: -1 })

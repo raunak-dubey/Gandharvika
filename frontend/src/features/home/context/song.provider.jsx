@@ -10,6 +10,7 @@ const SongProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(false);
   const [mood, setMood] = useState(null);
+  const [moodLogs, setMoodLogs] = useState([]);
 
   const [currentSong, setCurrentSong] = useState(null);
   const [cameraAvailable, setCameraAvailable] = useState(true);
@@ -37,9 +38,11 @@ const SongProvider = ({ children }) => {
       mood,
       currentSong,
       cameraAvailable,
+      moodLogs,
 
       setSongs,
       setRecommendations,
+      setMoodLogs,
       setLikedSongs,
       setHistory,
       setLoading,
@@ -47,7 +50,7 @@ const SongProvider = ({ children }) => {
       setCurrentSong,
       setCameraAvailable
     }),
-    [ songs, recommendations, likedSongs, history, loading, mood, currentSong, cameraAvailable ],
+    [ songs, recommendations, likedSongs, history, loading, mood, currentSong, cameraAvailable, moodLogs ],
   );
   return <SongContext.Provider value={value}>{children}</SongContext.Provider>;
 };

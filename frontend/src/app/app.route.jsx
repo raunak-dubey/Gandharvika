@@ -4,7 +4,7 @@ import Register from "../features/auth/pages/Register";
 import Protected from "./Protected";
 import Home from "../features/home/pages/Home";
 import LikedSongs from "../features/home/pages/LikedSong";
-import History from "../features/home/components/History";
+import History from "../features/home/pages/History";
 
 const router = createBrowserRouter([
   {

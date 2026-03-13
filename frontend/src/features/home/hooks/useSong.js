@@ -1,6 +1,6 @@
 import { useCallback, useContext } from "react";
 import SongContext from "../context/song.context";
-import { fetchRecommendations, fetchSongs, likeSong, fetchHistory, fetchLikedSong, logSongPlay } from "../services/song.api";
+import { fetchRecommendations, fetchSongs, likeSong, fetchHistory, fetchLikedSong, logSongPlay, fetchMoodLogs } from "../services/song.api";
 
 const useSong = () => {
   const {
@@ -12,8 +12,10 @@ const useSong = () => {
     mood,
     currentSong,
     cameraAvailable,
+    moodLogs,
 
     setSongs,
+    setMoodLogs,
     setRecommendations,
     setLikedSongs,
     setHistory,
@@ -84,11 +86,11 @@ const useSong = () => {
       console.error(error);
 
       setLikedSongs((prev) => {
-      if (isLiked) {
-        return [song, ...prev];
-      }
-      return prev.filter((s) => s._id !== songId);
-    });
+        if (isLiked) {
+          return [song, ...prev];
+        }
+        return prev.filter((s) => s._id !== songId);
+      });
 
     }
   }, [setLikedSongs, songs, recommendations, likedSongs]);
@@ -106,18 +108,19 @@ const useSong = () => {
     }
   }, [setLikedSongs]);
 
-  // ? get listening history
-  const getHistory = useCallback(async () => {
+  // ? get listening history and mood logs
+  const getHistoryPageData = useCallback(async () => {
     try {
-      const data = await fetchHistory();
-      const historyList = data?.history || [];
+      const historyData = await fetchHistory();
+      const moodData = await fetchMoodLogs();
 
-      setHistory(historyList);
+      setHistory(historyData?.history || []);
+      setMoodLogs(moodData.logs || []);
 
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
     }
-  }, [setHistory]);
+  }, [setHistory, setMoodLogs]);
 
   // ? Play song and log history
   const playSong = useCallback(async (song) => {
@@ -126,10 +129,14 @@ const useSong = () => {
 
     try {
       await logSongPlay(song._id, mood);
+      setHistory((prev) => [
+        { song, mood, playedAt: new Date() },
+        ...prev
+      ]);
     } catch (error) {
       console.error(error);
     }
-  }, [setCurrentSong, mood]);
+  }, [setCurrentSong, mood, setHistory]);
 
   // ? Play next song
   const playNext = () => {
@@ -160,6 +167,7 @@ const useSong = () => {
     mood,
     currentSong,
     cameraAvailable,
+    moodLogs,
 
     setCurrentSong,
     setCameraAvailable,
@@ -170,7 +178,7 @@ const useSong = () => {
     handleLikeSong,
     getLikedSongs,
 
-    getHistory,
+    getHistoryPageData,
 
     playSong,
     playNext,

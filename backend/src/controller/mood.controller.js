@@ -7,7 +7,7 @@ import asyncHandler from '../utils/asyncHandler.js';
  @desc Log detected mood
  */
 export const logMood = asyncHandler(async (req, res) => {
-  const userId = req.user._id
+  const userId = req.user.id
   const { mood, confidence } = req.body;
   if (!mood) {
     throw new ApiError(400, "Mood is required");
@@ -22,5 +22,21 @@ export const logMood = asyncHandler(async (req, res) => {
   res.status(201).json({
     success: true,
     log
+  });
+});
+
+/**
+ @routes Get /api/mood/log
+ @desc Get mood logs
+ */
+export const getMoodLogs = asyncHandler(async (req, res) => {
+  const userId = req.user.id
+  const logs = await moodLogModel.find({ user: userId })
+    .sort({ detectedAt: -1 })
+    .limit(30);
+
+  res.status(200).json({
+    success: true,
+    logs
   });
 });
