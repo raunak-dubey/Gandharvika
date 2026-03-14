@@ -1,5 +1,10 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import {
+    USERNAME_REGEX,
+    EMAIL_REGEX,
+    PASSWORD_REGEX
+} from '../../../shared/constants/validation.js';
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -7,21 +12,22 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Username is required.'],
         trim: true,
         lowercase: true,
-        match: [/^(?=.{6,30}$)[a-zA-Z][a-zA-Z0-9._]*$/, 'Username must contain only alphanumeric characters.']
+        unique: true,
+        match: [USERNAME_REGEX, 'Username must be 3-30 characters and only contain letters, numbers and underscores.']
     },
     email: {
         type: String,
         required: [true, 'Email is required.'],
         trim: true,
         lowercase: true,
-        match: [/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Please enter a valid email address.']
+        unique: true,
+        match: [EMAIL_REGEX, 'Email must be a valid email.']
     },
     password: {
         type: String,
         required: [true, 'Password is required.'],
         select: false,
-        minlength: [8, 'Password must be at least 8 characters long.'],
-        match: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, 'Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character.']
+        match: [PASSWORD_REGEX, 'Password must be at least 8 characters, one uppercase, one lowercase, one number and one special character.']
     },
     avatar: {
         type: String,
@@ -29,9 +35,6 @@ const userSchema = new mongoose.Schema({
         trim: true
     }
 }, { timestamps: true })
-
-userSchema.index({ email: 1 }, { unique: true });
-userSchema.index({ username: 1 }, { unique: true });
 
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
@@ -41,6 +44,13 @@ userSchema.pre('save', async function (next) {
 
 userSchema.methods.comparePassword = async function (password) {
     return await bcrypt.compare(password, this.password);
+};
+
+// ? Remove sensitive data from response
+userSchema.methods.toJSON = function () {
+  const obj = this.toObject();
+  delete obj.password;
+  return obj;
 };
 
 const userModel = mongoose.model('User', userSchema);

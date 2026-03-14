@@ -1,27 +1,32 @@
 import { body } from 'express-validator';
+import {
+  USERNAME_REGEX,
+  EMAIL_REGEX,
+  PASSWORD_REGEX
+} from '../../../../shared/constants/validation';
+import { BadRequestError } from '../../utils/ApiError';
 
 export const registerUserValidator = [
   body("username")
+    .trim()
     .notEmpty()
     .withMessage("Username is required")
-    .isLength({ min: 3, max: 30 })
-    .withMessage("Username must be between 3 and 30 characters")
-    .matches(/^[a-zA-Z0-9_]+$/)
-    .withMessage("Username can only contain letters, numbers, and underscore"),
+    .matches(USERNAME_REGEX)
+    .withMessage("Username must be 3-30 characters and only contain letters, numbers and underscores."),
 
   body("email")
+    .trim()
     .notEmpty()
     .withMessage("Email is required")
-    .isEmail()
-    .withMessage("Please provide a valid email")
-    .normalizeEmail(),
+    .matches(EMAIL_REGEX)
+    .withMessage("Email must be a valid email."),
 
   body("password")
     .notEmpty()
     .withMessage("Password is required")
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/)
+    .matches(PASSWORD_REGEX)
     .withMessage(
-      "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
+      "Password must be at least 8 characters, one uppercase, one lowercase, one number and one special character."
     ),
 
   body("avatar")
@@ -32,14 +37,15 @@ export const registerUserValidator = [
 
 export const loginUserValidator = [
   body("identifier")
+    .trim()
     .notEmpty()
     .withMessage("Username or Email is required")
     .custom((value) => {
-      const isEmail = validator.isEmail(value);
-      const isUsername = /^[a-zA-Z0-9_]{3,30}$/.test(value);
+      const isEmail = EMAIL_REGEX.test(value);
+      const isUsername = USERNAME_REGEX.test(value);
 
       if (!isEmail && !isUsername) {
-        throw new Error("Identifier must be a valid email or username");
+        throw new BadRequestError("Identifier must be a valid email or username");
       }
 
       return true;
@@ -48,8 +54,8 @@ export const loginUserValidator = [
   body("password")
     .notEmpty()
     .withMessage("Password is required")
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/)
+    .matches(PASSWORD_REGEX)
     .withMessage(
-      "Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character"
+      "Password must be at least 8 characters, one uppercase, one lowercase, one number and one special character."
     ),
 ];

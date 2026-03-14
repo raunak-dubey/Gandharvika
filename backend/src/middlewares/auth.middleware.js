@@ -1,32 +1,32 @@
 import jwt from 'jsonwebtoken';
 import { UnauthorizedError } from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
-import { getCache } from '../utils/cache.js';
-import crypto from 'crypto';
+import sessionModel from '../models/session.model.js';
 
 const authMiddleware = asyncHandler(async (req, res, next) => {
-    const token = req.cookies?.token;
-
-    if (!token) {
-        throw new UnauthorizedError('Access denied. No token provided.');
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        throw new UnauthorizedError("Access denied");
     }
+
+    const token = authHeader.split(" ")[1];
 
     let decoded;
     try {
-        decoded = jwt.verify(token, process.env.JWT_SECRET)
+        decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     } catch (err) {
-        throw new UnauthorizedError('Access denied. Invalid Token.');
+        throw new UnauthorizedError('Invalid or expired token');
     }
 
-    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
-
-    let isTokenBlacklisted = await getCache(`blacklist:${tokenHash}`);
-
-    if (isTokenBlacklisted) {
-        throw new UnauthorizedError('Access denied. Invalid Token.');
+    const session = await sessionModel.findById(decoded.sessionId);
+    if (!session || session.revoked) {
+        throw new UnauthorizedError("Session expired");
     }
 
-    req.user = decoded;
+    req.user = {
+        id: decoded.userId,
+        sessionId: decoded.sessionId
+    };
     next();
 });
 

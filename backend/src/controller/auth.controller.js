@@ -1,9 +1,11 @@
 import userModel from '../models/user.model.js';
-import generateToken from '../utils/generateToken.js'
+import sessionModel from '../models/session.model.js';
+
+import { generateAccessToken, generateRefreshToken, hashToken } from '../utils/token.js'
+import { refreshTokenCookieOptions } from '../utils/cookies.js';
+
 import { ConflictError, NotFoundError, UnauthorizedError } from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
-import { setCache } from '../utils/cache.js';
-import crypto from 'crypto';
 
 /**
  @routes POST /api/auth/register
@@ -27,17 +29,22 @@ export const registerUserController = asyncHandler(async (req, res) => {
         avatar
     })
 
-    const token = generateToken(user._id);
-    res.cookie('token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 3 * 24 * 60 * 60 * 1000 // 3 day
+    const refreshToken = generateRefreshToken(user._id);
+
+    const session = await sessionModel.create({
+        userId: user._id,
+        refreshTokenHash: hashToken(refreshToken),
+        ip: req.ip,
+        userAgent: req.headers['user-agent'],
     })
+    const accessToken = generateAccessToken(user._id, session._id);
+
+    res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
 
     return res.status(201).json({
         success: true,
         message: 'User registered successfully.',
+        accessToken,
         user: {
             id: user._id.toString(),
             username: user.username,
@@ -55,26 +62,32 @@ export const loginUserController = asyncHandler(async (req, res) => {
     const { identifier, password } = req.body;
 
     const user = await userModel.findOne({
-        $or: [
-            { username: identifier }, { email: identifier }
-        ]
-    }).select('+password')
+        $or: [ { username: identifier }, { email: identifier } ]
+    }).select('+password').lean()
 
     if (!user || !(await user.comparePassword(password))) {
         throw new UnauthorizedError('Invalid Credentials. Please try again.')
     }
 
-    const token = generateToken(user._id)
-    res.cookie('token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 3 * 24 * 60 * 60 * 1000 // 3 day
+    const refreshToken = generateRefreshToken(user._id);
+
+    const session = await sessionModel.create({
+        userId: user._id,
+        refreshTokenHash: hashToken(refreshToken),
+        ip: req.ip,
+        userAgent: req.headers['user-agent'],
     })
+    if (!session) {
+        throw new UnauthorizedError('Invalid Session. Please try again.')
+    }
+
+    const accessToken = generateAccessToken(user._id, session._id);
+    res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
 
     return res.status(200).json({
         success: true,
-        message: 'User logged in successfully.'
+        message: 'User logged in successfully.',
+        accessToken
     })
 });
 
@@ -84,15 +97,9 @@ export const loginUserController = asyncHandler(async (req, res) => {
  */
 export const getMeController = asyncHandler(async (req, res) => {
     const userId = req.user?.id;
-
-    if (!userId) {
-        throw new UnauthorizedError('Unauthorized')
-    }
-
     const user = await userModel.findById(userId).select('-password')
 
     if (!user) {
-        res.clearCookie('token');
         throw new NotFoundError('User not found.')
     }
 
@@ -109,20 +116,75 @@ export const getMeController = asyncHandler(async (req, res) => {
 });
 
 /**
+ @routes Get /api/auth/refresh
+ @desc Generate a new access token
+ */
+export const refreshUserController = asyncHandler(async (req, res) => {
+    const refreshToken = req.cookies?.refreshToken;
+
+    if (!refreshToken) {
+        throw new UnauthorizedError('Refresh token is required.')
+    }
+
+    const session = await sessionModel.findOne({ refreshTokenHash: hashToken(refreshToken), revoked: false })
+    if (!session) {
+        throw new UnauthorizedError('Invalid Session. Please try again.')
+    }
+
+    const newRefreshToken = generateRefreshToken(session.userId)
+    session.refreshTokenHash = hashToken(newRefreshToken)
+    await session.save();
+
+    const accessToken = generateAccessToken(user._id, session._id)
+    res.cookie('refreshToken', newRefreshToken, refreshTokenCookieOptions)
+
+    return res.status(200).json({
+        success: true,
+        message: 'User refreshed successfully.',
+        accessToken
+    })
+});
+
+/**
  @routes Get /api/auth/logout
  @desc logout a user
  */
 export const logoutUserController = asyncHandler(async (req, res) => {
-    const token = req.cookies?.token;
+    const refressToken = req.cookies?.refreshToken;
+    if (!refressToken) {
+        throw new UnauthorizedError('Invalid Credentials. Please try again.')
+    }
 
-    res.clearCookie('token');
+    const session = await sessionModel.updateOne({ refreshTokenHash: hashToken(refressToken), revoked: false }, { $set: { revoked: true } })
+    if (!session) {
+        throw new UnauthorizedError('Invalid Session. Please try again.')
+    }
 
-    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
-    const key = `blacklist:${tokenHash}`;
-    await setCache(key, '1', 3 * 24 * 60 * 60);
-
+    res.clearCookie('refreshToken');
     return res.status(200).json({
         success: true,
         message: 'Logout successfully.'
+    })
+});
+
+/**
+ @routes Post /api/auth/logout-all
+ @desc Logout a user from all devices
+ */
+export const logoutAllController = asyncHandler(async (req, res) => {
+    const refreshToken = req.cookies?.refreshToken;
+    if (!refreshToken) {
+        throw new UnauthorizedError('Invalid Credentials. Please try again.')
+    }
+
+    const session = await sessionModel.updateMany({ userId: req.user.id, revoked: false }, { $set: { revoked: true } })
+    if (!session) {
+        throw new UnauthorizedError('Invalid Session. Please try again.')
+    }
+
+    res.clearCookie('refreshToken');
+    return res.status(200).json({
+        success: true,
+        message: 'Logout from all devices successfully.'
     })
 });
