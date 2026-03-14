@@ -11,9 +11,14 @@ const songLikeSchema = new mongoose.Schema({
         ref: 'Song',
         required: true,
     },
-}, { timestamps: true });
+}, {
+    timestamps: true,
+    versionKey: false,
+    strict: true
+});
 
 songLikeSchema.index({ user: 1, song: 1 }, { unique: true });
+songLikeSchema.index({ song: 1 })
 
 const songLikeModel = mongoose.model('SongLike', songLikeSchema);
 export default songLikeModel;

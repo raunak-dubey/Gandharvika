@@ -4,8 +4,9 @@ import uploadFile from '../services/storage.service.js';
 import songModel from '../models/songs/song.model.js';
 import songLikeModel from '../models/songs/songLike.model.js';
 import listeningHistoryModel from '../models/listeningHistory.model.js';
-import ApiError from '../utils/ApiError.js';
+import { BadRequestError, NotFoundError } from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
+import { delCache, getCache, setCache } from '../utils/cache.js';
 
 /**
  @routes POST /api/song/
@@ -13,7 +14,7 @@ import asyncHandler from '../utils/asyncHandler.js';
  */
 export const uploadSong = asyncHandler(async (req, res) => {
     if (!req.file) {
-        throw new ApiError(400, "No file uploaded");
+        throw new BadRequestError("No file uploaded");
     }
 
     const songBuffer = req.file.buffer;
@@ -24,17 +25,21 @@ export const uploadSong = asyncHandler(async (req, res) => {
 
     const duration = Math.round(parsedTags.format.duration || 0);
 
+    if (!duration) {
+        throw new BadRequestError(400, "Invalid audio file");
+    }
+
     if (!id3Tags.title || !id3Tags.artist) {
-        throw new ApiError(400, "Invalid ID3 metadata");
+        throw new BadRequestError("Invalid ID3 metadata");
     }
 
     const exists = await songModel.findOne({
         title: id3Tags.title,
         artist: id3Tags.artist
-    });
+    }).lean();
 
     if (exists) {
-        throw new ApiError(400, "Song already exists");
+        throw new BadRequestError("Song already exists");
     }
 
     // ? Upload song to storage
@@ -79,8 +84,19 @@ export const uploadSong = asyncHandler(async (req, res) => {
 export const getSongs = asyncHandler(async (req, res) => {
     const { mood } = req.query;
 
+    const cacheKey = `songs:${mood || 'neutral'}`;
+    const cached = await getCache(cacheKey);
+    if (cached) {
+        return res.status(200).json({
+            success: true,
+            songs: cached
+        });
+    }
+
     const filter = mood ? { mood } : {};
-    const songs = await songModel.find(filter).sort({ playCount: -1 }).limit(10);
+    const songs = await songModel.find(filter).sort({ playCount: -1 }).limit(10).lean();
+
+    await setCache(cacheKey, songs, 600);
 
     res.status(200).json({
         success: true,
@@ -98,34 +114,63 @@ export const getRecommendedSongs = asyncHandler(async (req, res) => {
     const userId = req.user.id;
 
     if (!mood) {
-        throw new ApiError(400, "Mood is required");
+        throw new BadRequestError("Mood is required");
+    }
+
+    const cacheKey = `recommend:${userId}:${mood}`;
+    const cached = await getCache(cacheKey);
+    if (cached) {
+        return res.status(200).json({
+            success: true,
+            message: "Songs fetched from cache",
+            songs: cached
+        });
     }
 
     const [moodSongs, likedSongs, popular, historySongs] = await Promise.all([
         songModel.aggregate([
             { $match: { mood } },
-            { $sort: { playCount: -1 } },
-            { $sample: { size: 10 } }
+            { $sample: { size: 10 } },
+            { $project: { title: 1, artist: 1, audioUrl: 1, thumbnail: 1, playCount: 1, tags: 1 } },
         ]),
 
-        songLikeModel.find({ user: userId }).populate("song").limit(5),
+        songLikeModel.aggregate([
+            { $match: { user: userId } },
+            { $lookup: { from: "songs", localField: "song", foreignField: "_id", as: "song" } },
+            { $unwind: "$song" },
+            { $replaceRoot: { newRoot: "$song" } },
+            { $sample: { size: 5 } },
+            { $project: { title: 1, artist: 1, audioUrl: 1, thumbnail: 1, playCount: 1, tags: 1 } },
+        ]),
 
         songModel.aggregate([
             { $sort: { playCount: -1 } },
-            { $sample: { size: 5 } }
+            { $limit: 50 },
+            { $sample: { size: 5 } },
+            { $project: { title: 1, artist: 1, audioUrl: 1, thumbnail: 1, playCount: 1, tags: 1 } }
         ]),
-        listeningHistoryModel.find({ user: userId }).populate("song").limit(20),
+
+        listeningHistoryModel.aggregate([
+            { $match: { user: userId } },
+            { $sort: { createdAt: -1 } },
+            { $limit: 20 },
+            { $lookup: { from: "songs", localField: "song", foreignField: "_id", as: "song" } },
+            { $unwind: "$song" },
+            { $replaceRoot: { newRoot: "$song" } },
+            { $project: { title: 1, artist: 1, audioUrl: 1, thumbnail: 1, playCount: 1, tags: 1 } },
+        ]),
     ]);
 
     const tags = historySongs.flatMap(h => h.song?.tags || []);
     const tagSongs = await songModel.aggregate([
         { $match: { tags: { $in: tags } } },
-        { $sample: { size: 10 } }
+        { $sample: { size: 10 } },
+        { $project: { title: 1, artist: 1, audioUrl: 1, thumbnail: 1, playCount: 1, tags: 1 } },
     ]);
 
     const recommendations = [
-        ...historySongs.map(h => h.song),
-        ...likedSongs.map(l => l.song),
+        ...historySongs,
+        ...likedSongs,
         ...tagSongs,
         ...moodSongs,
         ...popular
@@ -134,6 +179,8 @@ export const getRecommendedSongs = asyncHandler(async (req, res) => {
     const uniqueSongs = Array.from(
         new Map(recommendations.map(s => [s._id.toString(), s])).values()
     );
+
+    await setCache(cacheKey, uniqueSongs.slice(0, 10), 300);
 
     res.status(200).json({
         success: true,
@@ -150,27 +197,22 @@ export const likeSong = asyncHandler(async (req, res) => {
     const { songId } = req.params;
     const userId = req.user.id;
 
-    const song = await songModel.findById(songId);
+    const song = await songModel.findById(songId).lean();
 
     if (!song) {
-        throw new ApiError(404, "Song not found");
+        throw new NotFoundError("Song not found");
     }
 
-    const like = await songLikeModel.findOne({
+    const like = await songLikeModel.findOneAndDelete({
         user: userId,
         song: songId
-    });
+    })
 
     if (like) {
-        await like.deleteOne();
-
-        await songModel.findByIdAndUpdate(songId, {
-            $inc: { likeCount: -1 }
-        });
+        await songModel.updateOne({ _id: songId }, { $inc: { likeCount: -1 } });
 
         return res.status(200).json({
             success: true,
-            message: "Song unliked successfully",
             liked: false
         });
     }
@@ -180,13 +222,12 @@ export const likeSong = asyncHandler(async (req, res) => {
         song: songId,
     });
 
-    await songModel.findByIdAndUpdate(songId, {
-        $inc: { likeCount: 1 }
-    });
+    await songModel.updateOne({ _id: songId }, { $inc: { likeCount: 1 } });
+
+    await delCache(`recommend:${userId}:${mood}`);
 
     res.status(200).json({
         success: true,
-        message: "Song liked successfully",
         liked: true
     });
 });
@@ -198,7 +239,7 @@ export const likeSong = asyncHandler(async (req, res) => {
 export const getLikedSongs = asyncHandler(async (req, res) => {
     const userId = req.user.id;
 
-    const likes = await songLikeModel.find({ user: userId }).populate("song").sort({ createdAt: -1 });
+    const likes = await songLikeModel.find({ user: userId }).populate("song").sort({ createdAt: -1 }).lean();
     const songs = likes.map((like) => like.song);
 
     res.status(200).json({

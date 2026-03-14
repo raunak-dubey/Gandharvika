@@ -5,6 +5,7 @@ const moodLogSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
+        index: true
     },
     detectedMood: {
         type: String,
@@ -12,15 +13,18 @@ const moodLogSchema = new mongoose.Schema({
         required: true,
     },
     confidence: {
-        type: Number
-    },
-    detectedAt: {
-        type: Date,
-        default: Date.now,
-    },
+        type: Number,
+        required: true,
+        min: 0,
+        max: 1,
+    }
+}, {
+    timestamps: true,
+    versionKey: false,
+    strict: true
 });
 
-moodLogSchema.index({ user: 1, detectedAt: -1 });
+moodLogSchema.index({ user: 1, createdAt: -1 });
 
 const moodLogModel = mongoose.model('MoodLog', moodLogSchema);
 export default moodLogModel;

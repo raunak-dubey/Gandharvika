@@ -1,5 +1,5 @@
 import moodLogModel from '../models/moodLog.model.js';
-import ApiError from '../utils/ApiError.js';
+import { BadRequestError } from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
 
 /**
@@ -10,7 +10,7 @@ export const logMood = asyncHandler(async (req, res) => {
   const userId = req.user.id
   const { mood, confidence } = req.body;
   if (!mood) {
-    throw new ApiError(400, "Mood is required");
+    throw new BadRequestError("Mood is required");
   }
 
   const log = await moodLogModel.create({
@@ -32,8 +32,9 @@ export const logMood = asyncHandler(async (req, res) => {
 export const getMoodLogs = asyncHandler(async (req, res) => {
   const userId = req.user.id
   const logs = await moodLogModel.find({ user: userId })
-    .sort({ detectedAt: -1 })
-    .limit(30);
+    .sort({ createdAt: -1 })
+    .limit(30)
+    .lean();
 
   res.status(200).json({
     success: true,

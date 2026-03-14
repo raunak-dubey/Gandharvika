@@ -4,17 +4,20 @@ const songSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        minlength: 3,
+        maxlength: 60,
     },
     artist: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        maxlength: 60,
     },
     album: {
         type: String,
-        required: true,
-        trim: true
+        trim: true,
+        default: null
     },
     mood: {
         type: String,
@@ -23,10 +26,12 @@ const songSchema = new mongoose.Schema({
             message: "mood must be sad, happy, neutral, angry, fearful, disgusted or surprised",
         },
         required: true,
+        index: true
     },
     audioUrl: {
         type: String,
         required: true,
+        trim: true
     },
     thumbnail: {
         type: String,
@@ -35,20 +40,24 @@ const songSchema = new mongoose.Schema({
     duration: {
         type: Number,
         required: true,
+        min: 1
     },
     uploadedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
+        index: true
     },
-     playCount: {
+    playCount: {
         type: Number,
-        default: 0
+        default: 0,
+        min: 0
     },
 
     likeCount: {
         type: Number,
-        default: 0
+        default: 0,
+        min: 0
     },
 
     tags: {
@@ -56,10 +65,13 @@ const songSchema = new mongoose.Schema({
         default: []
     }
 
-}, { timestamps: true });
+}, {
+    timestamps: true,
+    versionKey: false,
+    strict: true
+});
 
-songSchema.index({ mood: 1 });
-songSchema.index({ playCount: -1 });
+songSchema.index({ mood: 1, playCount: -1 });
 songSchema.index({ title: "text", artist: "text" });
 
 const songModel = mongoose.model('Song', songSchema);
