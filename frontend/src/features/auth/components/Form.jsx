@@ -1,84 +1,33 @@
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import "../styles/form.scss";
 import FormField from "./FormField";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { loginSchema, registerSchema } from "../validators/auth.schema";
 import useAuth from "../hooks/useAuth";
-import { useEffect, useState } from "react";
 
 const Form = ({ mode }) => {
   const isLogin = mode === "login";
 
-  const { loading, handleLogin, handleRegister, user } = useAuth();
+  const { login, register } = useAuth();
 
-  const navigate = useNavigate();
-
-  // ? set formData value
-  const [formData, setFormData] = useState({
-    identifier: "",
-    username: "",
-    email: "",
-    password: "",
+  const { register: registerField, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(isLogin ? loginSchema : registerSchema),
   });
 
-  const [formError, setFormError] = useState(null);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  // ? Validation
-  const validateLogin = () => {
-    if (!formData.identifier.trim()) return "Email or Username is required";
-    if (!formData.password.trim()) return "Password is required";
-    return null;
-  };
-
-  const validateRegister = () => {
-    if (!formData.username.trim()) return "Username is required";
-    if (!formData.email.trim()) return "Email is required";
-    if (!formData.password.trim()) return "Password is required";
-    if (formData.password.length < 6)
-      return "Password must be at least 6 characters";
-    return null;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const validationError = isLogin ? validateLogin() : validateRegister();
-
-    if (validationError) {
-      setFormError(validationError);
-      return;
-    }
-
-    try {
+  const onSubmit = async (data) => {
       if (isLogin) {
-        await handleLogin({
-          identifier: formData.identifier.trim(),
-          password: formData.password.trim(),
-        });
+        await login.mutateAsync({ identifier: data.identifier.trim(), password: data.password.trim() });
       } else {
-        await handleRegister({
-          username: formData.username.trim(),
-          email: formData.email.trim(),
-          password: formData.password.trim(),
-        });
+        await register.mutateAsync({ username: data.username.trim(), email: data.email.trim(), password: data.password.trim() });
       }
-    } catch (err) {
-      setFormError(err.message || "Something went wrong");
-    }
   };
 
-  useEffect(() => {
-    if (user) {
-      navigate("/");
-    }
-  }, [user, navigate]);
+  const loading = login.isPending || register.isPending;
+  const formError = login.error?.message || register.error?.message;
+
   return (
     <main className="auth-page">
       <div className="auth-form-container">
@@ -91,7 +40,7 @@ const Form = ({ mode }) => {
             : "Register to start sharing your moments"}
         </p>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           {isLogin ? (
             <FormField
               label="Email or Username"
@@ -99,8 +48,8 @@ const Form = ({ mode }) => {
               name="identifier"
               id="identifier"
               placeholder="Enter your email or username"
-              value={formData.identifier}
-              onChange={handleChange}
+              {...registerField("identifier")}
+              error={errors.identifier?.message}
             />
           ) : (
             <>
@@ -110,8 +59,8 @@ const Form = ({ mode }) => {
                 name="username"
                 id="username"
                 placeholder="Enter your username"
-                value={formData.username}
-                onChange={handleChange}
+                {...registerField("username")}
+                error={errors.username?.message}
               />
               <FormField
                 label="Email"
@@ -119,8 +68,8 @@ const Form = ({ mode }) => {
                 name="email"
                 id="email"
                 placeholder="Enter your email"
-                value={formData.email}
-                onChange={handleChange}
+                {...registerField("email")}
+                error={errors.email?.message}
               />
             </>
           )}
@@ -130,8 +79,8 @@ const Form = ({ mode }) => {
             name="password"
             id="password"
             placeholder="Enter your password"
-            value={formData.password}
-            onChange={handleChange}
+            {...registerField("password")}
+            error={errors.password?.message}
           />
 
           {!isLogin && <h4 className="forgetPass">Forget Password?</h4>}
