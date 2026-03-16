@@ -1,10 +1,12 @@
 import { Play, Pause, SkipBack, SkipForward, Volume2 } from "lucide-react";
 import "../../styles/music/music-player.scss";
 import { useEffect, useRef, useState } from "react";
-import useSong from "../../hooks/useSong";
+import usePlayerStore from "../../store/player.store";
+import useLogPlay from "../../hooks/mutations/useLogPlay";
 
 const MusicPlayer = () => {
-  const { currentSong, playNext, playPrev } = useSong();
+  const { currentSong, playNext, playPrev } = usePlayerStore();
+  const logPlay = useLogPlay();
   const audioRef = useRef(null);
 
   const [playing, setPlaying] = useState(false);
@@ -12,6 +14,7 @@ const MusicPlayer = () => {
   const [volume, setVolume] = useState(1);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+
 
   useEffect(() => {
     if (!currentSong || !audioRef.current) return;
@@ -22,15 +25,26 @@ const MusicPlayer = () => {
 
     audio
       .play()
-      .then(() => setPlaying(true))
+      .then(() => {
+        setPlaying(true);
+
+        console.log(currentSong?._id, currentSong?.mood);
+        
+
+        logPlay.mutate({ songId: currentSong?._id, mood: currentSong?.mood });
+      })
       .catch(() => setPlaying(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSong]);
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const handlePlay = () => setPlaying(true);
+    const handlePlay = () => {
+      setPlaying(true);
+    }
+
     const handlePause = () => setPlaying(false);
 
     audio.addEventListener("play", handlePlay);

@@ -3,8 +3,8 @@ import {
   USERNAME_REGEX,
   EMAIL_REGEX,
   PASSWORD_REGEX
-} from '../../../../shared/constants/validation';
-import { BadRequestError } from '../../utils/ApiError';
+} from '../../../../shared/constants/validation.js';
+import { BadRequestError } from '../../utils/ApiError.js';
 
 export const registerUserValidator = [
   body("username")

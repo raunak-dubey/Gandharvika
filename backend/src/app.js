@@ -1,12 +1,11 @@
 // ? Core Imports
+import cors from 'cors';
 import express from 'express';
 import cookieParser from 'cookie-parser'
-import cors from 'cors';
 
 // ? Security Imports
 import helmet from 'helmet';
-import mongoSanitize from 'express-mongo-sanitize';
-import rateLimit from 'express-rate-limit';
+import { apiLimiter, authLimiter } from './middlewares/rateLimiter.middleware.js';
 
 // ? Logging Imports
 import pinoHttp from 'pino-http';
@@ -23,21 +22,17 @@ import errorHandler from './middlewares/errorHandler.middleware.js';
 
 const app = express();
 
+// ? Core middlewares
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}));
+app.use(express.json());
+app.use(cookieParser());
+
 // ? Security middlewares
 app.use(helmet());
-app.use(mongoSanitize());
-
-// ? Rate limiting middleware
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100,
-    message:
-        'Too many requests from this IP, please try again after 15 minutes',
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-});
-
-app.use('/api', limiter);
+app.use('/api', apiLimiter);
 
 // ? Logging middleware
 app.use(pinoHttp({
@@ -49,16 +44,8 @@ app.use(pinoHttp({
     }
 }));
 
-// ? Core middlewares
-app.use(express.json());
-app.use(cookieParser());
-app.use(cors({
-    origin: 'http://localhost:5173',
-    credentials: true
-}));
-
 // ? Routes
-app.use('/api/auth', authRouter);
+app.use('/api/auth', authLimiter, authRouter);
 app.use('/api/song', songRouter);
 app.use('/api/history', listeningHistoryRouter);
 app.use('/api/mood', moodLogRouter);

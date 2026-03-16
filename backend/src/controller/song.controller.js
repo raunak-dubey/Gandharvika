@@ -70,6 +70,8 @@ export const uploadSong = asyncHandler(async (req, res) => {
         uploadedBy: req.user.id,
     });
 
+    await delCache(`recommend:*`);
+
     res.status(201).json({
         success: true,
         message: "Song uploaded successfully",
@@ -110,14 +112,9 @@ export const getSongs = asyncHandler(async (req, res) => {
  @desc get mood based recommendations
  */
 export const getRecommendedSongs = asyncHandler(async (req, res) => {
-    const { mood } = req.query;
     const userId = req.user.id;
 
-    if (!mood) {
-        throw new BadRequestError("Mood is required");
-    }
-
-    const cacheKey = `recommend:${userId}:${mood}`;
+    const cacheKey = `recommend:${userId}`;
     const cached = await getCache(cacheKey);
     if (cached) {
         return res.status(200).json({
@@ -127,27 +124,20 @@ export const getRecommendedSongs = asyncHandler(async (req, res) => {
         });
     }
 
-    const [moodSongs, likedSongs, popular, historySongs] = await Promise.all([
-        songModel.aggregate([
-            { $match: { mood } },
-            { $sample: { size: 10 } },
-            { $project: { title: 1, artist: 1, audioUrl: 1, thumbnail: 1, playCount: 1, tags: 1 } },
-        ]),
-
+    const [likedSongs, popular, historySongs] = await Promise.all([
         songLikeModel.aggregate([
             { $match: { user: userId } },
             { $lookup: { from: "songs", localField: "song", foreignField: "_id", as: "song" } },
             { $unwind: "$song" },
             { $replaceRoot: { newRoot: "$song" } },
             { $sample: { size: 5 } },
-            { $project: { title: 1, artist: 1, audioUrl: 1, thumbnail: 1, playCount: 1, tags: 1 } },
+            { $project: { title: 1, artist: 1, mood: 1, audioUrl: 1, thumbnail: 1, playCount: 1, tags: 1 } },
         ]),
 
         songModel.aggregate([
             { $sort: { playCount: -1 } },
-            { $limit: 50 },
-            { $sample: { size: 5 } },
-            { $project: { title: 1, artist: 1, audioUrl: 1, thumbnail: 1, playCount: 1, tags: 1 } }
+            { $limit: 10 },
+            { $project: { title: 1, artist: 1, mood: 1, audioUrl: 1, thumbnail: 1, playCount: 1, tags: 1 } }
         ]),
 
         listeningHistoryModel.aggregate([
@@ -157,22 +147,36 @@ export const getRecommendedSongs = asyncHandler(async (req, res) => {
             { $lookup: { from: "songs", localField: "song", foreignField: "_id", as: "song" } },
             { $unwind: "$song" },
             { $replaceRoot: { newRoot: "$song" } },
-            { $project: { title: 1, artist: 1, audioUrl: 1, thumbnail: 1, playCount: 1, tags: 1 } },
+            { $project: { title: 1, artist: 1, mood: 1, audioUrl: 1, thumbnail: 1, playCount: 1, tags: 1 } },
         ]),
     ]);
 
-    const tags = historySongs.flatMap(h => h.song?.tags || []);
-    const tagSongs = await songModel.aggregate([
-        { $match: { tags: { $in: tags } } },
-        { $sample: { size: 10 } },
-        { $project: { title: 1, artist: 1, audioUrl: 1, thumbnail: 1, playCount: 1, tags: 1 } },
-    ]);
+    const tags = [
+        ...historySongs.flatMap(s => s.tags || []),
+        ...likedSongs.flatMap(s => s.tags || []),
+    ]
+    const uniqueTags = [...new Set(tags)];
+    let tagSongs = [];
+
+    if (uniqueTags.length) {
+        tagSongs = await songModel.aggregate([
+            { $match: { tags: { $in: uniqueTags } } },
+            { $sample: { size: 10 } },
+            { $project: { title: 1, artist: 1, mood: 1, audioUrl: 1, thumbnail: 1, playCount: 1, tags: 1 } },
+        ]);
+    }
+
+    const recentSongs = await songModel
+        .find()
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .select("title artist mood audioUrl thumbnail playCount tags");
 
     const recommendations = [
-        ...historySongs,
         ...likedSongs,
+        ...historySongs,
         ...tagSongs,
-        ...moodSongs,
+        ...recentSongs,
         ...popular
     ];
 
@@ -224,7 +228,7 @@ export const likeSong = asyncHandler(async (req, res) => {
 
     await songModel.updateOne({ _id: songId }, { $inc: { likeCount: 1 } });
 
-    await delCache(`recommend:${userId}:${mood}`);
+    await delCache(`recommend:*`);
 
     res.status(200).json({
         success: true,

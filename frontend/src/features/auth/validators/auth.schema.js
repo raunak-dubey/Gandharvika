@@ -6,7 +6,7 @@ import {
 } from "../../../../../shared/constants/validation";
 
 export const registerSchema = z.object({
-  username: z.string().min(3, "Username is required")
+  username: z.string()
     .regex(USERNAME_REGEX, 'Username must be 3-30 characters and only contain letters, numbers and underscores.'),
 
   email: z.string().min(3, "Email is required")

@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { detectFaceExpression } from "../utils/faceDetect.utils";
 import "../styles/expression.scss";
-import useSong from "../hooks/useSong";
 import { loadFaceModels } from "../utils/faceApi.utils";
 import { startCamera, stopCamera } from "../utils/camera.utils";
+import useCameraStore from "../store/camera.store";
 
 const FaceExpression = () => {
   const videoRef = useRef(null);
@@ -12,7 +12,7 @@ const FaceExpression = () => {
   const [loading, setLoading] = useState(false);
   const [cameraError, setCameraError] = useState(false);
 
-  const { handleFetchSongs, setCameraAvailable, songs } = useSong();
+  const { setCameraAvailable, setMood } = useCameraStore();
 
   const handleDetect = useCallback(async () => {
     if (!videoRef.current) return;
@@ -21,19 +21,17 @@ const FaceExpression = () => {
     try {
       const mood = await detectFaceExpression(videoRef.current);
       if (mood) {
-        await handleFetchSongs(mood);
+        setMood(mood);
       }
     } catch (err) {
       console.error("Detection failed", err);
     }
     setLoading(false);
-  }, [handleFetchSongs]);
+  }, [setMood]);
 
   useEffect(() => {
     const init = async () => {
       await loadFaceModels();
-
-      if (!songs.length) await handleFetchSongs("neutral");
 
       try {
         const stream = await startCamera(videoRef.current);
@@ -47,7 +45,7 @@ const FaceExpression = () => {
     init();
 
     return () => stopCamera(streamRef.current);
-  }, [songs.length, handleFetchSongs, setCameraAvailable]);
+  }, [setCameraAvailable]);
 
   return (
     <section className="expression-section">

@@ -2,7 +2,7 @@ import MusicCard from "./MusicCard";
 import "../../styles/music/music-grid.scss";
 
 const MusicSection = ({ title, songs }) => {
-  if (!songs?.length) return null;
+  if (songs?.length === 0) return null;
 
   return (
     <section className="music-grid">

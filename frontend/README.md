@@ -231,17 +231,72 @@ backend/
 
 frontend/
  └── src/
-     ├── app
-     ├── features
-     │   ├── auth
-     │   └── home
-     │       ├── components
-     │       ├── context
-     │       ├── hooks
-     │       ├── pages
-     │       ├── services
-     │       └── styles
-     ├── shared
+     ├── app/
+     │   ├── App.jsx
+     │   │
+     │   ├── app.route.jsx # react router - create browser router
+     │   │
+     │   └── Protected.jsx # auth middleware
+     │
+     ├── features/
+     │   ├── auth/
+     │   │   ├── services /
+     │   │   │   └── auth.api.js
+     │   │   │
+     │   │   ├── hooks/
+     │   │   │   └── useAuth.js
+     │   │   │
+     │   │   ├── components/
+     │   │   │   └── Form.jsx
+     │   │   │
+     │   │   ├── pages/
+     │   │   │   ├── RegisterPage.jsx
+     │   │   │   └── LoginPage.jsx
+     │   │   │
+     │   │   ├── styles /
+     │   │   │   └── form.scss
+     │   │   │
+     │   │   └── context /
+     │   │       ├── auth.provider.jsx
+     │   │       └── auth.context.js
+     │   │
+     │   └── home /
+     │       ├── services /
+     │       │   ├── history.api.js
+     │       │   ├── mood.api.js
+     │       │   └── song.api.js
+     │       │
+     │       ├── hooks/
+     │       │   ├── useSongs.js
+     │       │   ├── useSong.js # Import every hooks and then export them in a single hook
+     │       │   ├── useLikes.js
+     │       │   └── usePlayer.js
+     │       │
+     │       ├── components/
+     │       │   ├── music/ # music components
+     │       │   │   ├── MusicCard.jsx
+     │       │   │   └── MusicPlayer.jsx
+     │       │   ├── FaceExpression.jsx
+     │       │   └── Sidebar.jsx
+     │       │
+     │       ├── pages/ # Outlet
+     │       │   ├── LikedSongs.jsx
+     │       │   ├── History.jsx
+     │       │   └── Home.jsx
+     │       │
+     │       ├── styles /
+     │       │   └── sidebar.scss
+     │       │
+     │       ├── context /
+     │       │   ├── song.provider.jsx
+     │       │   └── song.context.js
+     │       │
+     │       └── layout /
+     │           └── AppLayout.jsx # Layout for every page
+     │
+     ├── shared/
+     │   └── styles/
+     │       └── globals.scss
      └── main.jsx
 ```
 

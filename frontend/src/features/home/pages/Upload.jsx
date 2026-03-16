@@ -1,8 +1,6 @@
 import { useRef, useState } from "react";
-import Sidebar from "../components/Sidebar";
-import MusicPlayer from "../components/music/MusicPlayer";
 import "../styles/upload.scss";
-import useSong from "../hooks/useSong";
+import useUploadSong from "../hooks/mutations/useUploadSong";
 
 const Upload = () => {
   const [mood, setMood] = useState("");
@@ -11,7 +9,7 @@ const Upload = () => {
 
   const audioInputRef = useRef(null);
 
-  const { handleUploadSong, loading } = useSong();
+  const uploadSong = useUploadSong();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,7 +21,7 @@ const Upload = () => {
       return;
     }
 
-    await handleUploadSong(file, mood, tags);
+    await uploadSong.mutateAsync({ file, mood, tags });
 
     setSelectedFileName("");
     setMood("");
@@ -92,7 +90,7 @@ const Upload = () => {
           </div>
 
           <button className="upload-btn">
-            {loading ? "Uploading..." : "Upload Song"}
+            {uploadSong.isPending ? "Uploading..." : "Upload Song"}
           </button>
         </form>
       </div>

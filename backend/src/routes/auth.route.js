@@ -3,6 +3,7 @@ import { registerUserController, loginUserController, getMeController, logoutUse
 import authMiddleware from '../middlewares/auth.middleware.js';
 import { loginUserValidator, registerUserValidator } from '../middlewares/validators/auth.validator.js';
 import { validate } from '../middlewares/validator.middleware.js';
+import { loginLimiter, refreshLimiter, registerLimiter } from '../middlewares/rateLimiter.middleware.js';
 
 const authRouter = Router();
 
@@ -10,13 +11,13 @@ const authRouter = Router();
  @routes POST /api/auth/register
  @desc Register a new user to database
  */
-authRouter.post('/register', registerUserValidator, validate, registerUserController);
+authRouter.post('/register', registerLimiter, registerUserValidator, validate, registerUserController);
 
 /**
  @routes POST /api/auth/login
  @desc Login a user
  */
-authRouter.post('/login', loginUserValidator, validate, loginUserController);
+authRouter.post('/login', loginLimiter, loginUserValidator, validate, loginUserController);
 
 /**
  @routes Get /api/auth/get-me
@@ -28,7 +29,7 @@ authRouter.get('/get-me', authMiddleware, getMeController);
  @routes Post /api/auth/refresh
  @desc Generate a new access token
  */
-authRouter.post('/refresh', refreshUserController);
+authRouter.post('/refresh', refreshLimiter, refreshUserController);
 
 /**
  @routes Post /api/auth/logout

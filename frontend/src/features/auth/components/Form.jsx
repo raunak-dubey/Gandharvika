@@ -13,20 +13,39 @@ const Form = ({ mode }) => {
 
   const { login, register } = useAuth();
 
-  const { register: registerField, handleSubmit, formState: { errors } } = useForm({
+  const {
+    register: registerField,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     resolver: zodResolver(isLogin ? loginSchema : registerSchema),
   });
 
   const onSubmit = async (data) => {
+    try {
       if (isLogin) {
-        await login.mutateAsync({ identifier: data.identifier.trim(), password: data.password.trim() });
+        await login.mutateAsync({
+          identifier: data.identifier.trim(),
+          password: data.password.trim(),
+        });
       } else {
-        await register.mutateAsync({ username: data.username.trim(), email: data.email.trim(), password: data.password.trim() });
+        await register.mutateAsync({
+          username: data.username.trim(),
+          email: data.email.trim(),
+          password: data.password.trim(),
+        });
       }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const loading = login.isPending || register.isPending;
-  const formError = login.error?.message || register.error?.message;
+  const loading = login.isLoading || register.isLoading;
+  const formError =
+    login.error?.response?.data?.message ||
+    register.error?.response?.data?.message ||
+    login.error?.message ||
+    register.error?.message;
 
   return (
     <main className="auth-page">
@@ -45,8 +64,6 @@ const Form = ({ mode }) => {
             <FormField
               label="Email or Username"
               type="text"
-              name="identifier"
-              id="identifier"
               placeholder="Enter your email or username"
               {...registerField("identifier")}
               error={errors.identifier?.message}
@@ -56,8 +73,6 @@ const Form = ({ mode }) => {
               <FormField
                 label="Username"
                 type="text"
-                name="username"
-                id="username"
                 placeholder="Enter your username"
                 {...registerField("username")}
                 error={errors.username?.message}
@@ -65,8 +80,6 @@ const Form = ({ mode }) => {
               <FormField
                 label="Email"
                 type="email"
-                name="email"
-                id="email"
                 placeholder="Enter your email"
                 {...registerField("email")}
                 error={errors.email?.message}
@@ -76,8 +89,6 @@ const Form = ({ mode }) => {
           <FormField
             label="Password"
             type="password"
-            name="password"
-            id="password"
             placeholder="Enter your password"
             {...registerField("password")}
             error={errors.password?.message}
@@ -86,7 +97,6 @@ const Form = ({ mode }) => {
           {!isLogin && <h4 className="forgetPass">Forget Password?</h4>}
 
           {formError && <div className="form-error">{formError}</div>}
-
           <button
             type="submit"
             className={`btn ${loading ? "loading" : ""}`}

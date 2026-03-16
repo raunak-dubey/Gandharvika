@@ -5,14 +5,18 @@ import { useLogout } from "./useLogout";
 
 const useAuth = () => {
   const userQuery = useCurrentUser();
+  const loginMutation = useLogin();
+  const registerMutation = useRegister();
+  const logoutMutation = useLogout();
 
   return {
     user: userQuery.data ?? null,
-    loading: userQuery.isPending,
+    loading: userQuery.isLoading,
+    error: userQuery.error,
 
-    login: useLogin(),
-    register: useRegister(),
-    logout: useLogout(),
+    login: loginMutation,
+    register: registerMutation,
+    logout: logoutMutation,
   };
 };
 

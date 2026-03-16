@@ -24,7 +24,7 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
     }
 
     req.user = {
-        id: decoded.userId,
+        id: decoded.id,
         sessionId: decoded.sessionId
     };
     next();

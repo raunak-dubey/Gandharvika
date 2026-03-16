@@ -37,7 +37,7 @@ export const registerUserController = asyncHandler(async (req, res) => {
         ip: req.ip,
         userAgent: req.headers['user-agent'],
     })
-    const accessToken = generateAccessToken(user._id, session._id);
+    const accessToken = generateAccessToken(session.userId, session._id);
 
     res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
 
@@ -63,7 +63,7 @@ export const loginUserController = asyncHandler(async (req, res) => {
 
     const user = await userModel.findOne({
         $or: [ { username: identifier }, { email: identifier } ]
-    }).select('+password').lean()
+    }).select('+password');
 
     if (!user || !(await user.comparePassword(password))) {
         throw new UnauthorizedError('Invalid Credentials. Please try again.')
@@ -81,7 +81,7 @@ export const loginUserController = asyncHandler(async (req, res) => {
         throw new UnauthorizedError('Invalid Session. Please try again.')
     }
 
-    const accessToken = generateAccessToken(user._id, session._id);
+    const accessToken = generateAccessToken(session.userId, session._id);
     res.cookie('refreshToken', refreshToken, refreshTokenCookieOptions);
 
     return res.status(200).json({
@@ -97,7 +97,7 @@ export const loginUserController = asyncHandler(async (req, res) => {
  */
 export const getMeController = asyncHandler(async (req, res) => {
     const userId = req.user?.id;
-    const user = await userModel.findById(userId).select('-password')
+    const user = await userModel.findById(userId).select('-password');
 
     if (!user) {
         throw new NotFoundError('User not found.')
@@ -135,7 +135,7 @@ export const refreshUserController = asyncHandler(async (req, res) => {
     session.refreshTokenHash = hashToken(newRefreshToken)
     await session.save();
 
-    const accessToken = generateAccessToken(user._id, session._id)
+    const accessToken = generateAccessToken(session.userId, session._id)
     res.cookie('refreshToken', newRefreshToken, refreshTokenCookieOptions)
 
     return res.status(200).json({
