@@ -4,7 +4,7 @@ import usePlayer from "../../store/player.store";
 import "../../styles/music/music-card.scss";
 import { Heart } from "lucide-react";
 
-const MusicCard = ({ song }) => {
+const MusicCard = ({ song, songs }) => {
   const { playSong } = usePlayer();
   const likeSong = useLikeSong();
   const { data } = useLikedSongs();
@@ -13,7 +13,7 @@ const MusicCard = ({ song }) => {
   const liked = likedSongs?.some((s) => s._id === song._id);
 
   return (
-    <div className="music-card" onClick={() => playSong(song)} style={{marginBottom: '2rem'}}>
+    <div className="music-card" onClick={() => playSong(song, songs)} style={{marginBottom: '2rem'}}>
       <div className="cover">
         <img src={song.thumbnail} alt={song.title} />
         <div className="play-overlay">▶</div>

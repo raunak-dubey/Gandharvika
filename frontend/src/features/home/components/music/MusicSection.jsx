@@ -10,7 +10,7 @@ const MusicSection = ({ title, songs }) => {
 
       <div className="music-list">
         {songs.map((song) => (
-          <MusicCard key={song._id} song={song} />
+          <MusicCard key={song._id} song={song} songs={songs} />
         ))}
       </div>
     </section>

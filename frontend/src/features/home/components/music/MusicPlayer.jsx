@@ -3,9 +3,19 @@ import "../../styles/music/music-player.scss";
 import { useEffect, useRef, useState } from "react";
 import usePlayerStore from "../../store/player.store";
 import useLogPlay from "../../hooks/mutations/useLogPlay";
+import { Shuffle } from "lucide-react";
+import { Repeat } from "lucide-react";
 
 const MusicPlayer = () => {
-  const { currentSong, playNext, playPrev } = usePlayerStore();
+  const {
+    currentSong,
+    playNext,
+    playPrev,
+    toggleShuffle,
+    toggleRepeat,
+    repeat,
+    shuffle,
+  } = usePlayerStore();
   const logPlay = useLogPlay();
   const audioRef = useRef(null);
 
@@ -14,7 +24,6 @@ const MusicPlayer = () => {
   const [volume, setVolume] = useState(1);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-
 
   useEffect(() => {
     if (!currentSong || !audioRef.current) return;
@@ -28,13 +37,10 @@ const MusicPlayer = () => {
       .then(() => {
         setPlaying(true);
 
-        console.log(currentSong?._id, currentSong?.mood);
-        
-
         logPlay.mutate({ songId: currentSong?._id, mood: currentSong?.mood });
       })
       .catch(() => setPlaying(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSong]);
 
   useEffect(() => {
@@ -43,7 +49,7 @@ const MusicPlayer = () => {
 
     const handlePlay = () => {
       setPlaying(true);
-    }
+    };
 
     const handlePause = () => setPlaying(false);
 
@@ -55,6 +61,28 @@ const MusicPlayer = () => {
       audio.removeEventListener("pause", handlePause);
     };
   }, []);
+
+  // ? Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.code === "Space") {
+        e.preventDefault();
+        togglePlay();
+      }
+
+      if (e.code === "ArrowRight") {
+        playNext();
+      }
+
+      if (e.code === "ArrowLeft") {
+        playPrev();
+      }
+    };
+
+    window.addEventListener("keydown", handleKey);
+
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [playNext, playPrev]);
 
   const togglePlay = () => {
     const audio = audioRef.current;
@@ -69,6 +97,7 @@ const MusicPlayer = () => {
     }
   };
 
+  // ? Handle time updates
   const handleTimeUpdate = () => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -83,12 +112,14 @@ const MusicPlayer = () => {
     setProgress((current / duration) * 100);
   };
 
+  // ? Format time
   const formatTime = (time) => {
     const mins = Math.floor(time / 60);
     const secs = Math.floor(time % 60);
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
+  // ? Handle seeking
   const handleSeek = (e) => {
     const audio = audioRef.current;
     if (!audio || !audio.duration) return;
@@ -100,6 +131,7 @@ const MusicPlayer = () => {
     setProgress(value);
   };
 
+  // ? Handle volume changes
   const handleVolume = (e) => {
     const value = Number(e.target.value);
     audioRef.current.volume = value;
@@ -112,8 +144,6 @@ const MusicPlayer = () => {
     <div className="music-player">
       <audio
         ref={audioRef}
-        onPlay={() => setPlaying(true)}
-        onPause={() => setPlaying(false)}
         onTimeUpdate={handleTimeUpdate}
         onEnded={playNext}
       />
@@ -133,19 +163,30 @@ const MusicPlayer = () => {
 
       <div className="player-center">
         <div className="player-controls">
+          <button className={shuffle ? "active" : ""} onClick={toggleShuffle}>
+            <Shuffle size={18} />
+          </button>
+
           <button onClick={playPrev} disabled={!currentSong}>
-            <SkipBack size={18} />
+            <SkipBack size={20} />
           </button>
 
           <button
             className={`play-btn ${playing ? "active" : ""}`}
             onClick={togglePlay}
           >
-            {playing ? <Pause size={24} /> : <Play size={24} />}
+            {playing ? <Pause size={26} /> : <Play size={26} />}
           </button>
 
           <button onClick={playNext} disabled={!currentSong}>
-            <SkipForward size={18} />
+            <SkipForward size={20} />
+          </button>
+
+          <button
+            className={repeat !== "off" ? "active" : ""}
+            onClick={toggleRepeat}
+          >
+            {repeat === "one" ? <Repeat size={18} /> : <Repeat size={18} />}
           </button>
         </div>
 

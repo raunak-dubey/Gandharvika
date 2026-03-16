@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import listeningHistoryModel from '../models/listeningHistory.model.js';
 import songModel from '../models/songs/song.model.js'
 import { NotFoundError } from '../utils/ApiError.js';
@@ -38,12 +39,31 @@ export const playSong = asyncHandler(async (req, res) => {
  @desc Get listening history
 */
 export const getListeningHistory = asyncHandler(async (req, res) => {
-    const userId = req.user.id
-    const history = await listeningHistoryModel.find({ user: userId })
-        .populate("song")
-        .sort({ createdAt: -1 })
-        .limit(30)
-        .lean();
+    const userId = new mongoose.Types.ObjectId(req.user.id);
+
+    const history = await listeningHistoryModel.aggregate([
+        { $match: { user: userId } },
+        { $sort: { createdAt: -1 } },
+        {
+            $group: {
+                _id: "$song",
+                lastPlayed: { $first: "$createdAt" },
+                detectedMood: { $first: "$detectedMood" },
+            }
+        },
+        { $sort: { lastPlayed: -1 } },
+        { $limit: 30 },
+
+        {
+            $lookup: {
+                from: "songs",
+                localField: "_id",
+                foreignField: "_id",
+                as: "song"
+            }
+        },
+        { $unwind: "$song" }
+    ]);
 
     res.status(200).json({
         success: true,

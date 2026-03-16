@@ -12,8 +12,6 @@ const History = () => {
 
   const hasHistory = history.length > 0;
   const hasMoodLogs = moodLogs.length > 0;
-  console.log('history', history);
-  console.log("hasHistory", hasHistory);
 
   return (
     <div className="history-container">
@@ -27,7 +25,10 @@ const History = () => {
       {hasHistory && (
         <MusicSection
           title="Recently Played"
-          songs={history.map((h) => h.song)}
+          songs={history.map((h) => ({
+            ...h.song,
+            playCount: h.playCount,
+          }))}
         />
       )}
 
