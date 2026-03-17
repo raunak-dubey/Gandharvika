@@ -55,8 +55,8 @@ export const registerUserController = asyncHandler(async (req, res) => {
 })
 
 /**
- @routes POST /api/auth/login
- @desc Login a user
+    @routes POST /api/auth/login
+    @desc Login a user
  */
 export const loginUserController = asyncHandler(async (req, res) => {
     const { identifier, password } = req.body;
@@ -92,32 +92,8 @@ export const loginUserController = asyncHandler(async (req, res) => {
 });
 
 /**
- @routes Get /api/auth/get-me
- @desc Get logged in user details.
- */
-export const getMeController = asyncHandler(async (req, res) => {
-    const userId = req.user?.id;
-    const user = await userModel.findById(userId).select('-password');
-
-    if (!user) {
-        throw new NotFoundError('User not found.')
-    }
-
-    return res.status(200).json({
-        success: true,
-        message: 'User fetched successfully.',
-        user: {
-            id: user._id.toString(),
-            username: user.username,
-            email: user.email,
-            avatar: user.avatar
-        }
-    });
-});
-
-/**
- @routes Get /api/auth/refresh
- @desc Generate a new access token
+    @routes Get /api/auth/refresh
+    @desc Generate a new access token
  */
 export const refreshUserController = asyncHandler(async (req, res) => {
     const refreshToken = req.cookies?.refreshToken;
@@ -146,8 +122,8 @@ export const refreshUserController = asyncHandler(async (req, res) => {
 });
 
 /**
- @routes Get /api/auth/logout
- @desc logout a user
+    @routes Get /api/auth/logout
+    @desc logout a user
  */
 export const logoutUserController = asyncHandler(async (req, res) => {
     const refressToken = req.cookies?.refreshToken;

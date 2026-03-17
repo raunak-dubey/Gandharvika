@@ -1,12 +1,13 @@
+import useAuth from "@/features/auth/hooks/useAuth";
 import "../../styles/music/header.scss";
 import { useState } from "react";
 
 const MusicHeader = () => {
   const [search, setSearch] = useState("");
+  const { user } = useAuth();
 
   return (
     <header className="music-header">
-
       <div className="search-container">
         <input
           type="text"
@@ -17,9 +18,8 @@ const MusicHeader = () => {
       </div>
 
       <div className="profile-section">
-        <div className="profile-avatar">R</div>
+        <img className="profile-avatar" src={user.avatar} alt="avatar" />
       </div>
-
     </header>
   );
 };

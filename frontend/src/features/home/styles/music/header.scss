@@ -17,11 +17,10 @@
   }
 
   .profile-avatar {
-    @include center;
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: $accent;
     cursor: pointer;
+    object-fit: cover;
   }
 }

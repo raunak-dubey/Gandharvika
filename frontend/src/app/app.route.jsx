@@ -8,6 +8,7 @@ import LikedSongs from "../features/home/pages/LikedSong";
 import History from "../features/home/pages/History";
 import Upload from "../features/home/pages/Upload";
 import AppLayout from "../features/home/layout/AppLayout";
+import Account from "../features/home/pages/Account";
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,14 @@ const router = createBrowserRouter([
         element: (
           <Protected>
             <Upload />
+          </Protected>
+        ),
+      },
+      {
+        path: "/account",
+        element: (
+          <Protected>
+            <Account />
           </Protected>
         ),
       },

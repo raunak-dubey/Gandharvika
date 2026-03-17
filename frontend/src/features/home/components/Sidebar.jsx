@@ -1,6 +1,7 @@
 import { Home, ThumbsUp, History, Upload } from "lucide-react";
 import "../styles/sidebar.scss";
 import { NavLink } from "react-router";
+import { LucideUserCircle } from "lucide-react";
 
 const Sidebar = () => {
   const navItems = [
@@ -8,6 +9,7 @@ const Sidebar = () => {
     { icon: <Upload size={20} />, label: "Upload", path: "/upload" },
     { icon: <History size={20} />, label: "History", path: "/history" },
     { icon: <ThumbsUp size={20} />, label: "Liked Song", path: "/liked" },
+    { icon: <LucideUserCircle size={20} />, label: "My Account", path: "/account" },
   ];
 
   return (

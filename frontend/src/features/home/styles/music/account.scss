@@ -1,0 +1,244 @@
+.account-container {
+    max-width: $container-width;
+    margin: auto;
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+}
+
+/* SECTION */
+.settings-section {
+    background: $bg-tint;
+    border: $card-border;
+    border-radius: $radius;
+    padding: 1.8rem;
+    box-shadow: $shadow;
+
+    h2 {
+        margin-bottom: 1.4rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: $text;
+        letter-spacing: 0.3px;
+    }
+
+    &.danger {
+        border: 1px solid rgba(255, 77, 109, 0.25);
+        background: rgba(255, 77, 109, 0.04);
+        margin-bottom: 3rem;
+
+        p {
+            color: $muted;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+    }
+}
+
+/* HEADER */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ROW */
+.settings-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    align-items: center;
+    padding: 1rem 0;
+    border-top: $card-border;
+
+    &:first-of-type {
+        border-top: none;
+    }
+
+    .label {
+        font-size: 0.8rem;
+        color: $muted;
+        font-weight: 500;
+    }
+
+    .content {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        input {
+            width: 100%;
+            max-width: 420px;
+            background: $bg;
+            border: $card-border;
+            border-radius: $radius;
+            padding: 0.65rem 0.85rem;
+            color: $text;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+
+            &:hover {
+                border-color: rgba(255, 255, 255, 0.1);
+            }
+
+            &:focus {
+                outline: none;
+                border-color: $accent;
+                box-shadow: 0 0 0 2px rgba($accent, 0.25);
+            }
+        }
+    }
+
+    .avatar-row {
+        img {
+            width: 72px;
+            height: 72px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.06);
+        }
+    }
+}
+
+/* ACTIONS */
+.actions {
+    margin-top: 1.2rem;
+    display: flex;
+    gap: 0.8rem;
+}
+
+/* BUTTONS */
+.primary {
+    background: $accent;
+    color: white;
+    border: none;
+    padding: 0.55rem 1rem;
+    border-radius: $radius;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: $accent-2;
+    }
+
+    &:active {
+        transform: scale(0.97);
+    }
+}
+
+.secondary {
+    background: $hover;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 0.5rem 0.9rem;
+    border-radius: $radius;
+    font-size: 0.8rem;
+    cursor: pointer;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.12);
+    }
+}
+
+.ghost {
+    background: transparent;
+    border: none;
+    color: $muted;
+    font-size: 0.8rem;
+    cursor: pointer;
+
+    &:hover {
+        color: $text;
+    }
+}
+
+.danger-btn {
+    background: rgba(255, 77, 109, 0.08);
+    border: 1px solid rgba(255, 77, 109, 0.4);
+    color: #ff4d6d;
+    padding: 0.6rem 1rem;
+    border-radius: $radius;
+    font-size: 0.8rem;
+    cursor: pointer;
+
+    &:hover {
+        background: rgba(255, 77, 109, 0.15);
+    }
+}
+
+.danger-text {
+    background: none;
+    border: none;
+    color: #ff4d6d;
+    cursor: pointer;
+    font-size: 0.75rem;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.avatar-btn {
+    background: $hover;
+    padding: 0.4rem 0.7rem;
+    border-radius: $radius;
+    font-size: 0.75rem;
+    cursor: pointer;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.12);
+    }
+}
+
+/* SESSIONS */
+.sessions-list {
+    margin-top: 0.5rem;
+}
+
+.session-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.9rem 0;
+    border-top: $card-border;
+
+    .device {
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .location {
+        font-size: 0.75rem;
+        color: $muted;
+        margin-top: 2px;
+    }
+
+    .session-right {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+
+    &.current {
+        border-left: 2px solid $accent;
+        padding-left: 0.6rem;
+    }
+}
+
+/* BADGE */
+.badge {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.55rem;
+    border-radius: 999px;
+    font-weight: 500;
+
+    &.active {
+        background: rgba(0, 200, 150, 0.15);
+        color: #00c896;
+    }
+
+    &.current {
+        background: rgba($accent, 0.2);
+        color: $accent-2;
+    }
+}
