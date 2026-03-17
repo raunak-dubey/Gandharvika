@@ -95,6 +95,19 @@
       background: color.adjust($accent, $lightness: 8%);
     }
   }
+
+  .repeat-btn {
+    position: relative;
+
+    .repeat-one {
+      position: absolute;
+      bottom: -2px;
+      right: -4px;
+      font-size: 0.6rem;
+      font-weight: 600;
+      color: $accent;
+    }
+  }
 }
 
 /* PROGRESS */

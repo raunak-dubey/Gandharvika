@@ -77,12 +77,29 @@ const MusicPlayer = () => {
       if (e.code === "ArrowLeft") {
         playPrev();
       }
+
+      if (e.code === "KeyR") {
+        toggleRepeat();
+      }
+
+      if (e.code === "KeyS") {
+        toggleShuffle();
+      }
+
+      if (e.code === "ArrowUp") {
+        e.preventDefault();
+        volumeUp();
+      }
+      if (e.code === "ArrowDown") {
+        e.preventDefault();
+        volumeDown();
+      }
     };
 
     window.addEventListener("keydown", handleKey);
 
     return () => window.removeEventListener("keydown", handleKey);
-  }, [playNext, playPrev]);
+  }, [playNext, playPrev, toggleShuffle, toggleRepeat]);
 
   const togglePlay = () => {
     const audio = audioRef.current;
@@ -96,6 +113,28 @@ const MusicPlayer = () => {
       setPlaying(false);
     }
   };
+
+  const volumeUp = () => {
+      const audio = audioRef.current;
+      if (!audio) return;
+
+      setVolume((prev) => {
+        const newVolume = Math.min(prev + 0.05, 1);
+        audio.volume = newVolume;
+        return newVolume;
+      });
+    };
+
+    const volumeDown = () => {
+      const audio = audioRef.current;
+      if (!audio) return;
+
+      setVolume((prev) => {
+        const newVolume = Math.max(prev - 0.05, 0);
+        audio.volume = newVolume;
+        return newVolume;
+      });
+    };
 
   // ? Handle time updates
   const handleTimeUpdate = () => {
@@ -138,6 +177,16 @@ const MusicPlayer = () => {
     setVolume(value);
   };
 
+  const handleEnded = () => {
+    if (repeat === "one") {
+      const audio = audioRef.current;
+      audio.currentTime = 0;
+      audio.play();
+    } else {
+      playNext();
+    }
+  };
+
   if (!currentSong) return null;
 
   return (
@@ -145,7 +194,7 @@ const MusicPlayer = () => {
       <audio
         ref={audioRef}
         onTimeUpdate={handleTimeUpdate}
-        onEnded={playNext}
+        onEnded={handleEnded}
       />
 
       <div className="song-info">
@@ -183,10 +232,11 @@ const MusicPlayer = () => {
           </button>
 
           <button
-            className={repeat !== "off" ? "active" : ""}
+            className={`repeat-btn ${repeat !== "off" ? "active" : ""}`}
             onClick={toggleRepeat}
           >
-            {repeat === "one" ? <Repeat size={18} /> : <Repeat size={18} />}
+            <Repeat size={18} />
+            {repeat === "one" && <span className="repeat-one">1</span>}
           </button>
         </div>
 
