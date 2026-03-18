@@ -1,6 +1,5 @@
 import Router from 'express';
-import { registerUserController, loginUserController, logoutUserController, refreshUserController, logoutAllController } from '../controller/auth.controller.js';
-import authMiddleware from '../middlewares/auth.middleware.js';
+import { registerUserController, loginUserController, refreshUserController } from '../controller/auth.controller.js';
 import { loginUserValidator, registerUserValidator } from '../middlewares/validators/auth.validator.js';
 import { validate } from '../middlewares/validator.middleware.js';
 import { loginLimiter, refreshLimiter, registerLimiter } from '../middlewares/rateLimiter.middleware.js';
@@ -24,17 +23,5 @@ authRouter.post('/login', loginLimiter, loginUserValidator, validate, loginUserC
     @desc Generate a new access token
  */
 authRouter.post('/refresh', refreshLimiter, refreshUserController);
-
-/**
-    @routes Post /api/auth/logout
-    @desc Logout a user
- */
-authRouter.post('/logout', logoutUserController);
-
-/**
-    @routes Post /api/auth/logout-all
-    @desc Logout a user from all devices
- */
-authRouter.post('/logout-all', authMiddleware, logoutAllController);
 
 export default authRouter;

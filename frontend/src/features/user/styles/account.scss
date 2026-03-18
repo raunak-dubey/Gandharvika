@@ -5,6 +5,29 @@
     display: flex;
     flex-direction: column;
     gap: 1.8rem;
+
+    .account-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+
+        h1 {
+            font-size: 1.6rem;
+            margin-bottom: 0.3rem;
+        }
+
+        p {
+            color: $muted;
+            font-size: 0.85rem;
+        }
+    }
+
+    .error {
+        font-size: 0.75rem;
+        color: #ff4d6d;
+        margin-top: 4px;
+    }
 }
 
 /* SECTION */

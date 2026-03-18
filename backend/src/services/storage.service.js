@@ -4,7 +4,7 @@ const client = new ImageKit({
     privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
 });
 
-const uploadFile = async ({ buffer, fileName, folder = "" }) => {
+export const uploadFile = async ({ buffer, fileName, folder = "" }) => {
     const file = await client.files.upload({
         file: await toFile(Buffer.from(buffer)),
         fileName: fileName,
@@ -13,4 +13,8 @@ const uploadFile = async ({ buffer, fileName, folder = "" }) => {
     return file;
 };
 
-export default uploadFile;
+export const deleteFile = async ({ fileId, folder = "" }) => {
+    await client.files.delete(fileId, {
+        folder
+    });
+};

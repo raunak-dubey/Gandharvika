@@ -3,12 +3,12 @@ import Login from "../features/auth/pages/Login";
 import Register from "../features/auth/pages/Register";
 import Protected from "./Protected";
 
-import Home from "../features/home/pages/Home";
-import LikedSongs from "../features/home/pages/LikedSong";
-import History from "../features/home/pages/History";
-import Upload from "../features/home/pages/Upload";
-import AppLayout from "../features/home/layout/AppLayout";
-import Account from "../features/home/pages/Account";
+import Home from "@/features/song/pages/Home";
+import LikedSongs from "@/features/song/pages/LikedSong";
+import History from "@/features/song/pages/History";
+import Upload from "@/features/song/pages/Upload";
+import AppLayout from "@/layout/AppLayout";
+import Account from "@/features/user/pages/Account";
 
 const router = createBrowserRouter([
   {

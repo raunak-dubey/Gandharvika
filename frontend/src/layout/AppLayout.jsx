@@ -1,7 +1,7 @@
 import { Outlet } from "react-router";
-import Sidebar from "../components/Sidebar";
-import MusicPlayer from "../components/music/MusicPlayer";
-import '../styles/appLayout.scss'
+import Sidebar from "@/layout/components/Sidebar";
+import MusicPlayer from "@/layout/components/MusicPlayer";
+import '@/layout/styles/appLayout.scss';
 
 const AppLayout = () => {
 

@@ -4,7 +4,7 @@ const FormField = forwardRef(
   ({ label, type, placeholder, error, ...props }, ref) => {
     return (
       <div className="field">
-        <label htmlFor={props.id || props.name}>{label}</label>
+        <label htmlFor={props.name}>{label}</label>
         <input
           ref={ref}
           type={type}

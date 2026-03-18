@@ -1,10 +1,10 @@
-import useAuth from "@/features/auth/hooks/useAuth";
 import "../../styles/music/header.scss";
 import { useState } from "react";
+import useUser from "@/features/user/hooks/queries/useUser";
 
 const MusicHeader = () => {
   const [search, setSearch] = useState("");
-  const { user } = useAuth();
+  const { user } = useUser();
 
   return (
     <header className="music-header">

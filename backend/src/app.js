@@ -16,6 +16,8 @@ import authRouter from './routes/auth.route.js';
 import songRouter from './routes/song.route.js';
 import listeningHistoryRouter from './routes/listeningHistory.route.js';
 import moodLogRouter from './routes/mood.route.js';
+import userRouter from './routes/user.route.js';
+import sessionRouter from './routes/session.routes.js';
 
 // ? Error Handling Imports
 import errorHandler from './middlewares/errorHandler.middleware.js';
@@ -49,6 +51,8 @@ app.use('/api/auth', authLimiter, authRouter);
 app.use('/api/song', songRouter);
 app.use('/api/history', listeningHistoryRouter);
 app.use('/api/mood', moodLogRouter);
+app.use('/api/user', userRouter)
+app.use('/api/session', sessionRouter)
 
 // ? Global Error handler
 app.use(errorHandler)

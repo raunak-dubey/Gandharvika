@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { getSongs, uploadSong, getRecommendedSongs, likeSong, getLikedSongs } from '../controller/song.controller.js';
 import authMiddleware from '../middlewares/auth.middleware.js';
-import uploadMiddleware from '../middlewares/upload.middleware.js';
+import upload from '../middlewares/upload.middleware.js';
 
 const songRouter = Router();
 
@@ -9,7 +9,7 @@ const songRouter = Router();
  @routes POST /api/song/
  @desc Upload a song.
  */
-songRouter.post('/', authMiddleware, uploadMiddleware, uploadSong);
+songRouter.post('/', authMiddleware, upload.single('song'), uploadSong);
 
 /**
  @routes Get /api/song/

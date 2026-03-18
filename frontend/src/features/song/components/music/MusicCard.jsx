@@ -1,6 +1,6 @@
 import useLikeSong from "../../hooks/mutations/useLikeSong";
 import useLikedSongs from "../../hooks/queries/useLikedSongs";
-import usePlayer from "../../store/player.store";
+import usePlayer from "../../../../layout/store/player.store";
 import "../../styles/music/music-card.scss";
 import { Heart } from "lucide-react";
 

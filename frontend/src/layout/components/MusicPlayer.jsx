@@ -1,8 +1,8 @@
 import { Play, Pause, SkipBack, SkipForward, Volume2 } from "lucide-react";
-import "../../styles/music/music-player.scss";
+import "@/layout/styles/music-player.scss";
 import { useEffect, useRef, useState } from "react";
-import usePlayerStore from "../../store/player.store";
-import useLogPlay from "../../hooks/mutations/useLogPlay";
+import usePlayerStore from "@/layout/store/player.store";
+import useLogPlay from "@/features/song/hooks/mutations/useLogPlay";
 import { Shuffle } from "lucide-react";
 import { Repeat } from "lucide-react";
 

@@ -1,6 +1,8 @@
-import sessionModel from "../models/session.model";
-import asyncHandler from "../utils/asyncHandler";
-import { NotFoundError } from "../utils/ApiError";
+import sessionModel from "../models/session.model.js";
+import asyncHandler from "../utils/asyncHandler.js";
+import { NotFoundError } from "../utils/ApiError.js";
+import { UAParser } from 'ua-parser-js';
+import { hashToken } from '../utils/token.js';
 
 /**
     @routes Get /api/session/get-sessions
@@ -8,12 +10,29 @@ import { NotFoundError } from "../utils/ApiError";
  */
 
 export const getSessionsController = asyncHandler(async (req, res) => {
+    const refreshToken = req.cookies?.refreshToken;
+    const currentHash = refreshToken ? hashToken(refreshToken) : null;
+
     const sessions = await sessionModel.find({ userId: req.user.id }).sort({ createdAt: -1 });
+
+    const formatted = sessions.map((s) => {
+        const parser = new UAParser(s.userAgent);
+        const browser = parser.getBrowser();
+        const os = parser.getOS();
+
+        return {
+            _id: s._id,
+            device: `${browser.name || "Unknown"} - ${os.name || "Unknown"}`,
+            createdAt: s.createdAt,
+            active: !s.revoked,
+            current: currentHash && s.refreshTokenHash === currentHash,
+        }
+    });
 
     return res.status(200).json({
         success: true,
         message: 'Sessions fetched successfully.',
-        sessions
+        sessions: formatted
     })
 });
 

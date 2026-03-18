@@ -1,6 +1,6 @@
 import id3 from 'node-id3';
 import { parseBuffer } from 'music-metadata';
-import uploadFile from '../services/storage.service.js';
+import { uploadFile } from '../services/storage.service.js';
 import songModel from '../models/songs/song.model.js';
 import songLikeModel from '../models/songs/songLike.model.js';
 import listeningHistoryModel from '../models/listeningHistory.model.js';

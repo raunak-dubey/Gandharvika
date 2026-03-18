@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: 'https://ik.imagekit.io/skietn14x/default_avatar.png?updatedAt=1770897539718',
         trim: true
+    },
+    avatarFileId: {
+        type: String,
+        trim: true
     }
 }, { timestamps: true })
 

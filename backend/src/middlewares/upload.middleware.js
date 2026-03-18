@@ -8,6 +8,4 @@ const upload = multer({
     }
 });
 
-const uploadMiddleware = upload.single('song')
-
-export default uploadMiddleware;
+export default upload;
