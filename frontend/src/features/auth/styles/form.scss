@@ -62,15 +62,6 @@
             }
         }
 
-        .forgetPass {
-            font-size: 0.9rem;
-            color: $muted;
-            text-align: right;
-            font-weight: 500;
-            cursor: pointer;
-            margin-top: $gap-sm;
-        }
-
         .form-footer {
             @include center;
             gap: $gap;

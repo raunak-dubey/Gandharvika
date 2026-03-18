@@ -94,8 +94,6 @@ const Form = ({ mode }) => {
             error={errors.password?.message}
           />
 
-          {!isLogin && <h4 className="forgetPass">Forget Password?</h4>}
-
           {formError && <div className="form-error">{formError}</div>}
           <button
             type="submit"
